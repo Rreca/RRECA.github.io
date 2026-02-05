@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     btnInsights.addEventListener('click', function () {
       showSection('section-insights');
       renderInsights();
+      if (typeof updateGoalChip === 'function') updateGoalChip();
     });
   }
 
@@ -54,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (btnSoft && typeof pickSoftTask === 'function') btnSoft.addEventListener('click', pickSoftTask);
   if (btnPanic && typeof panicNoThink === 'function') btnPanic.addEventListener('click', panicNoThink);
 
-  // ✅ Toggle sliders mini
+  // Toggle sliders mini
   var btnQuickToggle = document.getElementById('btn-quick-toggle');
   if (btnQuickToggle && typeof setQuickEditHidden === 'function' && typeof isQuickEditHidden === 'function') {
     btnQuickToggle.addEventListener('click', function () {
@@ -72,12 +73,27 @@ document.addEventListener('DOMContentLoaded', function () {
   if (fImpact) fImpact.addEventListener('click', function () { backlogSortMode = 'impact'; renderToday(); });
   if (fRecent) fRecent.addEventListener('click', function () { backlogSortMode = 'recent'; renderToday(); });
 
-  // ✅ Cerrar panel detalle
+  // Cerrar panel detalle
   var closeBtn = document.getElementById('knot-detail-close');
   if (closeBtn) {
     closeBtn.addEventListener('click', function () {
       var detail = document.getElementById('knot-detail');
       if (detail) detail.style.display = 'none';
+    });
+  }
+
+  // ✅ NAV: elegir qué cerrar
+  var btnCloseGoalNav = document.getElementById('btn-close-goalNav');
+  if (btnCloseGoalNav && typeof closeGoalOneClickNav === 'function') {
+    btnCloseGoalNav.addEventListener('click', closeGoalOneClickNav);
+  }
+
+  // ✅ ANÁLISIS: 1 click
+  var btnCloseGoal = document.getElementById('btn-close-goal');
+  if (btnCloseGoal && typeof closeGoalOneClick === 'function') {
+    btnCloseGoal.addEventListener('click', function () {
+      closeGoalOneClick();
+      if (typeof updateGoalChip === 'function') updateGoalChip();
     });
   }
 });
@@ -98,11 +114,10 @@ function showSoftNudgeChip(knotId, days) {
   var title = knot ? knot.title : 'Nudo';
 
   chip.style.display = 'inline-block';
-  chip.className = 'badge doing'; // reutiliza estilo
+  chip.className = 'badge doing';
   chip.style.cursor = 'pointer';
   chip.textContent = `🔁 Seguí 5 min · ${title} · evitado ${days}d`;
 
-  // Click: abre el foco 5 min (sin modal extra)
   chip.onclick = function () {
     try {
       if (typeof startFiveMin === 'function') startFiveMin(knotId);
@@ -115,10 +130,8 @@ function checkNudgeOnLoad() {
   var knots = getKnots();
   var now = Date.now();
 
-  // Si ya hay DOING, no interrumpas: solo chip suave
   var doing = knots.find(function (k) { return k.status === 'DOING'; });
 
-  // elegimos el UNLOCKABLE más evitado (más viejo)
   var staleUnlockables = knots
     .filter(function (k) { return k.status === 'UNLOCKABLE'; })
     .sort(function (a, b) {
@@ -131,14 +144,12 @@ function checkNudgeOnLoad() {
   var lastTouch = k.lastTouchedAt || k.createdAt || now;
   var days = Math.max(1, Math.floor((now - lastTouch) / (24 * 60 * 60 * 1000)));
 
-  // si hay DOING -> chip suave y chau
   if (doing) {
     showSoftNudgeChip(k.id, days);
     logEvent('NUDGE_SHOWN', { reason: 'UNLOCKABLE_STALE_48H_SOFT_CHIP', knotId: k.id });
     return;
   }
 
-  // === Si NO hay DOING: modal con referencia + CTAs ===
   function safeEscape(s) {
     try { return (typeof escapeHTML === 'function') ? escapeHTML(s) : String(s); }
     catch (_) { return String(s); }
@@ -211,8 +222,6 @@ function checkNudgeOnLoad() {
 
   logEvent('NUDGE_SHOWN', { reason: 'UNLOCKABLE_STALE_48H', knotId: k.id });
 }
-
-
 
 function handleCaptureClick() {
   var result = canCaptureNewKnot();
