@@ -57,6 +57,7 @@
     }
   }
 
+  /* useCapture = false (3er parámetro): Safari/iOS antiguos no soportan { passive: true } */
   document.addEventListener('touchstart', function (e) {
     var t = e.target;
     var tag = (t.tagName || '').toUpperCase();
@@ -71,7 +72,7 @@
       touchStartX = e.clientX || 0;
       touchStartY = e.clientY || 0;
     }
-  }, { passive: true });
+  }, false);
 
   document.addEventListener('touchmove', function (e) {
     if (!touchStartClickable) return;
@@ -88,7 +89,7 @@
     if (dx * dx + dy * dy > MOVE_THRESHOLD_PX * MOVE_THRESHOLD_PX) {
       touchMoved = true;
     }
-  }, { passive: true });
+  }, false);
 
   document.addEventListener('touchend', function (e) {
     var clickable = touchStartClickable;
@@ -103,5 +104,5 @@
 
     e.preventDefault();
     fireClick(clickable);
-  }, { passive: false });
+  }, false);
 })();
