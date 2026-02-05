@@ -1,4 +1,4 @@
-/***********************
+﻿/***********************
  * GIST SYNC (Nudos)
  * - Guarda/Carga nudos en un Gist: nudos.json
  * - Requiere GitHub Token (scope: gist) guardado en localStorage
