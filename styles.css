@@ -20,6 +20,15 @@ h1 { margin: 6px 0 12px; }
   align-items: center;
 }
 
+/* Compatibilidad táctil (iPad mini 1ª gen y dispositivos antiguos) */
+.btn {
+  -webkit-tap-highlight-color: rgba(11, 94, 215, 0.2);
+  tap-highlight-color: rgba(11, 94, 215, 0.2);
+  min-height: 44px;
+  min-width: 44px;
+  box-sizing: border-box;
+}
+
 .btn {
   padding: 10px 12px;
   background-color: #e9ecef;
@@ -45,7 +54,13 @@ h1 { margin: 6px 0 12px; }
   color: white;
 }
 
-.small { padding: 8px 10px; font-size: 13px; }
+.small {
+  padding: 8px 10px;
+  font-size: 13px;
+  min-height: 44px;
+  min-width: 44px;
+  box-sizing: border-box;
+}
 
 main { position: relative; }
 section { margin-bottom: 18px; }
@@ -394,10 +409,14 @@ body.hide-quick .quick-edit {
 /* ===== DETALLE DEL NUDO (panel) – FIX MOBILE ===== */
 #knot-detail {
   position: fixed;
-  inset: 0;                 /* top/right/bottom/left: 0 */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
+  height: 100%;
   height: 100vh;
-  height: 100dvh;           /* correcto en móviles modernos */
+  height: 100dvh;           /* correcto en móviles modernos; fallback 100vh arriba */
   background: #fff;
   padding: 16px;
   padding-top: 52px;        /* espacio para la X */
@@ -410,6 +429,7 @@ body.hide-quick .quick-edit {
 
 /* Contenido scrolleable */
 #knot-detail-content {
+  height: calc(100vh - 52px);
   height: calc(100dvh - 52px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
@@ -422,25 +442,38 @@ body.hide-quick .quick-edit {
   position: absolute;
   top: 12px;
   right: 12px;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   background: #fff;
   cursor: pointer;
   font-size: 20px;
   line-height: 1;
-  display: grid;
-  place-items: center;
+  display: -webkit-box;
+  display: box;
+  display: flex;
+  -webkit-box-align: center;
+  box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  box-pack: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  tap-highlight-color: rgba(0, 0, 0, 0.1);
 }
 
 /* Desktop: volver al panel lateral */
 @media (min-width: 769px) {
   #knot-detail {
-    inset: auto;
-    right: 0;
     top: 0;
+    right: 0;
+    left: auto;
+    bottom: auto;
     width: 320px;
+    height: 100%;
     height: 100vh;
     height: 100dvh;
     border-left: 1px solid #ddd;
@@ -448,6 +481,7 @@ body.hide-quick .quick-edit {
   }
 
   #knot-detail-content {
+    height: calc(100vh - 52px);
     height: calc(100dvh - 52px);
   }
 }
@@ -487,4 +521,330 @@ body.hide-quick .quick-edit {
   border-radius: 999px;
   background: #111;
   display: inline-block;
+}
+
+/* ===== Insight: Meta diaria + alerta suave ===== */
+.goal-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.goal-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #d7d7d7;
+  background: #fff;
+  font-size: 12px;
+}
+
+.goal-warn {
+  border-color: #ffc107;
+  background: #fff7e0;
+}
+
+.goal-ok {
+  border-color: #198754;
+  background: #e8fff1;
+}
+
+.goal-pill input[type="number"]{
+  width: 70px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+}
+/* Meta diaria */
+#goal-chip {
+  border-color: #0b5ed7;
+  background: #e8f0ff;
+  font-weight: 800;
+}
+.btn-subcopy {
+  font-size: 11px;
+  opacity: 0.65;
+  margin-left: -6px;
+  margin-right: 8px;
+  align-self: center;
+  white-space: nowrap;
+}
+/* Nav: que alinee bien todo */
+.nav{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:center;
+  align-items:stretch; /* clave: todos estiran al alto mayor */
+}
+
+/* Botón base: todos mismo alto */
+.btn{
+  height:52px;               /* <-- fijá el alto que quieras */
+  padding: 6px 12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  white-space:nowrap;
+}
+
+/* Botón con 2 líneas */
+.btn-with-sub{
+  flex-direction:column;     /* 2 líneas vertical */
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  text-align:center;
+}
+
+/* Texto principal y subcopy */
+.btn-main{ line-height:1.1; font-weight:600; }
+.btn-sub { line-height:1.1; font-size:11px; opacity:.7; }
+/* Timer chip HUD */
+#timer-chip.badge {
+  position: fixed;
+  right: 12px;
+  top: 12px;
+  z-index: 9999;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 16px;
+  line-height: 1.2;
+  max-width: min(420px, calc(100vw - 24px));
+  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  backdrop-filter: blur(6px);
+}
+
+/* Cuando el timer está corriendo, que se vea fuerte */
+#timer-chip.badge.doing {
+  font-weight: 700;
+}
+
+/* El texto dentro del chip: que no se desborde feo */
+#timer-chip {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* =========================
+   PATCH – ARCHIVED + CONTEXT BADGES + ARCHIVED PANEL
+   ========================= */
+
+/* Estado ARCHIVED (badge) */
+.badge.archived {
+  border-color: #6f42c1;
+  background: #f3e8ff;
+  font-weight: 800;
+}
+
+/* Badges de contexto (ctx-*) */
+.badge.ctx-home   { border-color: #198754; background: #e8fff1; font-weight: 700; }
+.badge.ctx-street { border-color: #fd7e14; background: #fff3e6; font-weight: 700; }
+.badge.ctx-work   { border-color: #0b5ed7; background: #e8f0ff; font-weight: 700; }
+.badge.ctx-any    { border-color: #6c757d; background: #f1f3f5; font-weight: 700; }
+
+/* Botón “Mostrar/Ocultar” dentro de panel header (Archivados) */
+.panel h3 {
+  margin-top: 0;
+}
+
+/* Archivados: botones de micro-items */
+#archived-body .btn.small {
+  height: 38px;           /* no uses 52px acá, queda gordo */
+  padding: 6px 10px;
+  border-radius: 12px;
+}
+
+/* Archivados: “chips” clicables en wrap */
+#archived-body .row {
+  gap: 8px;
+}
+
+/* Detalle: select y botones se acomoden mejor en mobile */
+#knot-detail select,
+#knot-detail input {
+  max-width: 100%;
+}
+
+/* Si querés que el panel de Archivados tenga “sensación” de sección distinta */
+#archived-body .panel {
+  background: #fcfbff;
+  border-color: #eadcff;
+}
+
+/* Opcional: que los botones de Restore/Delete en detalle respiren */
+#knot-detail .btn {
+  margin-top: 4px;
+}
+/* =========================
+   ACCORDION PRO – ARCHIVADOS
+   ========================= */
+
+.accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+
+.accordion-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.accordion-caret {
+  font-size: 16px;
+  transition: transform 0.25s ease;
+}
+
+/* cuerpo animado */
+.accordion-body {
+  overflow: hidden;
+  transition: max-height 0.35s ease, opacity 0.25s ease;
+  opacity: 1;
+}
+
+.accordion-body.collapsed {
+  max-height: 0 !important;
+  opacity: 0;
+}
+
+/* caret rotado cuando está abierto */
+.accordion-open .accordion-caret {
+  transform: rotate(90deg); /* ▸ -> ▾ */
+}
+
+/* look un poco más fino para archivados */
+.panel-archived {
+  background: #fcfbff;
+  border-color: #eadcff;
+}
+/* Accordion pro – Archivados */
+.accordion-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  cursor:pointer;
+  user-select:none;
+}
+.accordion-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.accordion-caret{
+  font-size:16px;
+  transition:transform .25s ease;
+}
+.accordion-body{
+  overflow:hidden;
+  transition:max-height .35s ease, opacity .25s ease;
+  opacity:1;
+}
+.accordion-body.collapsed{
+  max-height:0 !important;
+  opacity:0;
+}
+.accordion-open .accordion-caret{
+  transform:rotate(90deg);
+}
+
+/* look suave opcional */
+.panel-archived{
+  background:#fcfbff;
+  border-color:#eadcff;
+}
+/* ===== Context switch (segmented control pro) ===== */
+.context-switch{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px;
+  border-radius:999px;
+  background:#f1f3f5;
+  border:1px solid #e2e6ea;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  margin-left: 6px; /* para que respire respecto a Capturar */
+}
+
+/* cada “segmento” */
+.context-btn{
+  -webkit-tap-highlight-color: rgba(11, 94, 215, 0.2);
+  tap-highlight-color: rgba(11, 94, 215, 0.2);
+  appearance:none;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  user-select:none;
+
+  height:40px;
+  min-height:44px;
+  padding:0 14px;
+  border-radius:999px;
+  box-sizing:border-box;
+
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+
+  font-size:14px;
+  font-weight:700;
+  color:#111;
+
+  transition: transform .06s ease, filter .2s ease, background-color .2s ease, color .2s ease, opacity .2s ease;
+}
+
+.context-btn:hover{ filter: brightness(0.98); }
+.context-btn:active{ transform: translateY(1px); }
+
+/* activo = modo seleccionado */
+.context-btn.active{
+  background:#0b5ed7;
+  color:#fff;
+  box-shadow: 0 8px 20px rgba(11,94,215,0.22);
+}
+
+/* separador antes de ALL */
+.context-divider{
+  width:1px;
+  height:22px;
+  background:#d7d7d7;
+  opacity:.7;
+  margin:0 2px;
+}
+
+/* ALL al final y atenuado */
+.context-btn.context-all{
+  opacity:.55;
+}
+
+/* ALL activo: visible pero no gritón */
+.context-btn.context-all.active{
+  opacity:1;
+  background:#111;
+  color:#fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+}
+
+/* responsive opcional */
+@media (max-width: 520px){
+  .context-btn span{ display:none; }
+  .context-btn{ padding:0 12px; }
+}
+.nav{
+  display:flex;
+  flex-wrap:wrap;
+}
+
+.context-switch{
+  flex-basis: 100%;   /* fuerza nueva fila */
+  justify-content: center;
+  margin-top: 8px;
 }
