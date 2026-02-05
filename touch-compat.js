@@ -20,6 +20,15 @@
   var touchStartClickable = null;
   var touchMoved = false;
 
+  var supportsPassive = false;
+  try {
+    var opts = Object.defineProperty({}, 'passive', { get: function () { supportsPassive = true; return true; } });
+    window.addEventListener('testPassive', function () {}, opts);
+    window.removeEventListener('testPassive', function () {}, opts);
+  } catch (e) {}
+  var passiveOpt = supportsPassive ? { passive: true } : false;
+  var nonPassiveOpt = supportsPassive ? { passive: false } : false;
+
   function findClickable(el) {
     while (el && el !== document.body) {
       if (el.nodeType !== 1) { el = el.parentElement; continue; }
@@ -57,7 +66,7 @@
     }
   }
 
-  /* useCapture = false (3er parámetro): Safari/iOS antiguos no soportan { passive: true } */
+  /* touchstart/touchmove: passive para no bloquear scroll; touchend: non-passive para poder preventDefault() */
   document.addEventListener('touchstart', function (e) {
     var t = e.target;
     var tag = (t.tagName || '').toUpperCase();
@@ -72,7 +81,7 @@
       touchStartX = e.clientX || 0;
       touchStartY = e.clientY || 0;
     }
-  }, false);
+  }, passiveOpt);
 
   document.addEventListener('touchmove', function (e) {
     if (!touchStartClickable) return;
@@ -89,7 +98,7 @@
     if (dx * dx + dy * dy > MOVE_THRESHOLD_PX * MOVE_THRESHOLD_PX) {
       touchMoved = true;
     }
-  }, false);
+  }, passiveOpt);
 
   document.addEventListener('touchend', function (e) {
     var clickable = touchStartClickable;
@@ -104,5 +113,5 @@
 
     e.preventDefault();
     fireClick(clickable);
-  }, false);
+  }, nonPassiveOpt);
 })();
