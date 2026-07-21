@@ -1,0 +1,21 @@
+1. Notificaciones locales — @capacitor/local-notifications
+
+El mayor problema del anti-procrastinación es que el usuario abre la app solo cuando se acuerda. Con notificaciones locales podés programar: "Son las 9am, tenés 2 desbloqueables esperando" o "Llevás 2 días sin abrir Nudos, la cadena está en riesgo". Esto es lo más impactante de la lista. El recordatorio externo rompe el ciclo de olvido que es la raíz de la procrastinación.
+
+2. Widget de pantalla de inicio — @capacitor-community/android-widgets
+
+Ver el nudo EN PROGRESO directamente en el home screen sin abrir la app. La fricción de abrir una app es suficiente para que el usuario la ignore. Un widget con el título del nudo activo y un botón "✅ Hecho" elimina esa fricción completamente.
+
+3. Captura por voz — @capacitor/speech-recognition
+
+El momento de capturar un nudo suele ser cuando tenés las manos ocupadas o estás en movimiento. Poder decir "nuevo nudo: llamar al médico" sin tocar la pantalla reduce la fricción de captura a casi cero. Combinado con el contexto automático (ya existe) sería muy poderoso.
+
+4. Haptic feedback real — @capacitor/haptics
+
+Hoy usás navigator.vibrate() que en iOS no funciona. El plugin de Capacitor usa las APIs nativas de vibración en ambas plataformas. Impacto: el feedback táctil al marcar HECHO, al terminar el timer, y al cambiar de estado refuerza el hábito a nivel sensorial — es psicología de refuerzo positivo pura.
+
+5. Keep screen on durante el timer — @capacitor-community/keep-awake
+
+Cuando el usuario arranca el timer de 5 minutos y pone el teléfono sobre la mesa, la pantalla se apaga y pierde el contexto visual. Mantener la pantalla encendida durante el focus timer es un cambio de una línea de código con impacto real en la experiencia.
+
+Esas son las 5 que realmente moverían la aguja. Las otras ideas que descarté (share, calendar sync, etc.) agregan complejidad sin resolver un problema real de procrastinación.

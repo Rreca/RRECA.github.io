@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!--
+        Ícono Nudos: cuerda que forma un nudo abierto (desatándose)
+        Diseño: trazo grueso blanco sobre fondo azul, forma de nudo infinito/trefoil simplificado
+    -->
+
+    <!-- Loop izquierdo del nudo -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 38,30 C 20,30 18,52 30,58 C 42,64 50,50 42,42 C 34,34 22,38 24,50 C 26,62 40,68 52,62" />
+
+    <!-- Loop derecho del nudo -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 70,30 C 88,30 90,52 78,58 C 66,64 58,50 66,42 C 74,34 86,38 84,50 C 82,62 68,68 56,62" />
+
+    <!-- Cuerda central que conecta — el nudo desatándose -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M 52,62 C 54,70 54,78 54,82" />
+
+    <!-- Cola izquierda -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:pathData="M 38,30 C 42,24 50,22 54,26" />
+
+    <!-- Cola derecha -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:pathData="M 70,30 C 66,24 58,22 54,26" />
+
+    <!-- Punto de intersección del nudo — indica que se está desatando -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 54,26 m -5,0 a 5,5 0 1,0 10,0 a 5,5 0 1,0 -10,0" />
+
+</vector>

@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>🧩 Dividir nudo</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Cancelar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="padding: 16px;">
+
+    <div class="notice">
+      Convertimos 1 monstruo en 2 micro-pasos.<br/>
+      <b>{{ knot.title }}</b>
+    </div>
+
+    <div class="field">
+      <label>Micro paso 1</label>
+      <input [(ngModel)]="step1" placeholder="Primer paso..." class="ion-input-native" />
+    </div>
+
+    <div class="field">
+      <label>Contexto micro 1</label>
+      <select [(ngModel)]="ctx1" class="ion-select-native">
+        <option value="AUTO">Auto (hereda: {{ parentContextLabel }})</option>
+        <option value="HOME">🏠 Casa</option>
+        <option value="STREET">🚶 Calle</option>
+        <option value="WORK">💼 Trabajo</option>
+        <option value="ANY">🌐 General</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Micro paso 2</label>
+      <input [(ngModel)]="step2" placeholder="Segundo paso..." class="ion-input-native" />
+    </div>
+
+    <div class="field">
+      <label>Contexto micro 2</label>
+      <select [(ngModel)]="ctx2" class="ion-select-native">
+        <option value="AUTO">Auto (hereda: {{ parentContextLabel }})</option>
+        <option value="HOME">🏠 Casa</option>
+        <option value="STREET">🚶 Calle</option>
+        <option value="WORK">💼 Trabajo</option>
+        <option value="ANY">🌐 General</option>
+      </select>
+    </div>
+
+    <div style="margin-top: 16px; display: flex; gap: 10px;">
+      <ion-button fill="solid" color="primary" (click)="submit()">Crear micro-pasos</ion-button>
+      <ion-button fill="outline" (click)="dismiss()">Cancelar</ion-button>
+    </div>
+
+  </div>
+</ion-content>

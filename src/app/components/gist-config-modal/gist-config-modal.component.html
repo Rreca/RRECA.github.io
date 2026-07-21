@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Sync con Gist</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="padding: 16px;">
+
+    <div class="notice">
+      Esto permite usar la app desde varios dispositivos.<br/>
+      <span class="hint">Recomendado: Gist "Secret".</span>
+    </div>
+
+    <div class="field">
+      <label>Gist ID</label>
+      <input [(ngModel)]="gistId" placeholder="ej: abc123..." class="ion-input-native" />
+      <span class="hint">Es el ID que aparece en la URL del Gist.</span>
+    </div>
+
+    <div class="field">
+      <label>Token GitHub (scope: gist)</label>
+      <input [(ngModel)]="token" placeholder="ghp_..." class="ion-input-native" />
+      <span class="hint">Guardalo solo en tus dispositivos de confianza.</span>
+    </div>
+
+    <div style="margin-top: 16px; display: flex; gap: 10px;">
+      <ion-button fill="solid" color="primary" (click)="save()">Guardar</ion-button>
+      <ion-button fill="outline" (click)="dismiss()">Cerrar</ion-button>
+    </div>
+
+  </div>
+</ion-content>

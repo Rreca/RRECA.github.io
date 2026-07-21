@@ -1,0 +1,176 @@
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div style="padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 60px); max-width: 680px; margin: 0 auto;">
+
+    <!-- ── Encabezado ── -->
+    <div style="margin-bottom: 24px;">
+      <div style="font-size:22px; font-weight:900; color:var(--color-gray-900); letter-spacing:-0.02em;">Análisis</div>
+      <div style="font-size:13px; color:var(--color-gray-400); margin-top:2px;">Tu progreso, honesto y sin filtros.</div>
+    </div>
+
+    <!-- ════ Conteos ════ -->
+    <div class="panel">
+      <h3>Estado del sistema</h3>
+      <div class="stat-row"
+        *ngFor="let s of ['DOING','UNLOCKABLE','DONE','SOMEDAY','BLOCKED','ARCHIVED']"
+        (click)="navigateToStatus(s)"
+        role="button"
+        [attr.aria-label]="'Ver ' + statusToEs(s)">
+        <span class="stat-label">
+          <span class="badge" [ngClass]="s.toLowerCase()">{{ statusToEs(s) }}</span>
+        </span>
+        <span style="display:flex; align-items:center; gap:8px;">
+          <span class="stat-value" [ngClass]="'stat-value-' + s.toLowerCase()">{{ counts[s] ?? 0 }}</span>
+          <span style="font-size:14px; color:var(--color-gray-400);">›</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- ════ Meta + Racha ════ -->
+    <div class="panel">
+      <h3>Meta mínima diaria</h3>
+
+      <!-- Streak prominente -->
+      <div class="streak-display">
+        <div class="streak-number">{{ streak }}</div>
+        <div class="streak-label">
+          <strong>{{ streak === 1 ? 'día seguido' : 'días seguidos' }}</strong>
+          {{ goalMet ? 'Mínimo cumplido hoy. No cortes.' : 'Hacé 1 cosa hoy para seguir la racha.' }}
+        </div>
+      </div>
+
+      <!-- Estado hoy -->
+      <div class="notice" [style.background]="goalMet ? 'var(--color-success-soft)' : 'var(--color-warning-soft)'"
+           style="margin-top:12px;">
+        {{ goalMet ? '🟢' : '🟡' }}
+        Hoy: <b>{{ doneToday }}</b> hecho(s) de <b>{{ dailyGoal }}</b> en tu meta.
+      </div>
+
+      <!-- Cambiar meta -->
+      <div class="goal-row">
+        <span class="goal-pill" [class.goal-warn]="!goalMet" [class.goal-ok]="goalMet">
+          Meta:
+          <input type="number" min="1" max="20" [(ngModel)]="goalInput"
+            style="width:48px; padding:3px 6px; border-radius:8px; border:1px solid var(--color-gray-200); background:white; color:var(--color-gray-900); font-size:13px; font-weight:700; text-align:center;" />
+        </span>
+        <ion-button size="small" fill="solid" color="primary" (click)="saveGoal()">Guardar</ion-button>
+        <ion-button size="small" fill="clear" color="medium" (click)="goalInput=1; saveGoal()">Poner en 1</ion-button>
+      </div>
+
+      <div style="font-size:11px; color:var(--color-gray-400); margin-top:10px;">
+        Regla 0,01%: la meta mínima no se discute. Aunque sea una pavada.
+      </div>
+    </div>
+
+    <!-- ════ Momentum ════ -->
+    <div class="panel">
+      <h3>Momentum — últimos 7 días</h3>
+      <div *ngFor="let d of momentumDays"
+        style="display:grid; grid-template-columns:36px 1fr 24px; gap:10px; align-items:center; margin:8px 0;">
+        <div style="font-size:11px; color:var(--color-gray-400); text-align:right;">{{ d.label }}</div>
+        <div class="momentum-bar-track">
+          <div class="momentum-bar-fill" [style.width.%]="d.pct"></div>
+        </div>
+        <div style="font-size:12px; font-weight:700; color:var(--color-gray-600); text-align:right;">{{ d.count }}</div>
+      </div>
+      <div style="font-size:11px; color:var(--color-gray-400); margin-top:10px;">
+        1 HECHO por día = identidad nueva.
+      </div>
+    </div>
+
+    <!-- ════ Archivados ════ -->
+    <details id="section-archived" [open]="archivedOpen" (toggle)="archivedOpen = $any($event.target).open" style="margin-bottom:16px;">
+      <summary style="list-style:none; cursor:pointer;">
+        <div class="section-header">
+          <span class="section-title">
+            <span class="accordion-caret" [class.open]="archivedOpen">▸</span>
+            Archivados
+          </span>
+          <span class="section-meta">{{ archivedKnots.length }} · {{ splitThisWeek }} splits esta semana</span>
+        </div>
+      </summary>
+
+      <div class="panel" style="margin-top:8px;">
+        <div *ngIf="!archivedKnots.length" class="notice">Nada archivado todavía.</div>
+
+        <div *ngFor="let group of archivedGroups" style="margin-bottom:16px;">
+          <div style="font-size:11px; font-weight:800; color:var(--color-gray-400); letter-spacing:0.06em; text-transform:uppercase; margin-bottom:8px;">
+            {{ group.label }}
+          </div>
+          <div *ngFor="let rg of group.reasons" style="margin-bottom:12px;">
+            <div style="font-size:11px; color:var(--color-gray-400); margin-bottom:6px;">
+              {{ rg.reason }} · {{ rg.items.length }}
+            </div>
+            <div *ngFor="let item of rg.items" class="archive-item">
+              <div style="display:flex; align-items:center; justify-content:space-between;">
+                <span style="font-size:14px; font-weight:600; color:var(--color-gray-900);">{{ item.knot.title }}</span>
+                <ion-button size="small" fill="clear" color="medium" (click)="openArchivedDetail(item.knot)">
+                  Ver
+                </ion-button>
+              </div>
+              <!-- Hijos (solo SPLIT) -->
+              <div *ngIf="item.children.length" class="archive-children">
+                <div *ngFor="let child of item.children" class="archive-child-row">
+                  <span class="arrow">↳</span>
+                  <span class="badge" [ngClass]="child.statusClass">{{ child.statusLabel }}</span>
+                  <span>{{ child.knot.title }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <!-- ════ Notificaciones ════ -->
+    <div class="panel">
+      <h3>Notificaciones</h3>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+        <div>
+          <div style="font-size:14px; color:var(--color-gray-600); line-height:1.5;">
+            Recordatorios matutinos, protección de racha y celebraciones.
+          </div>
+          <div style="font-size:12px; color:var(--color-gray-400); margin-top:2px;">
+            {{ notifEnabled ? '🔔 Activas' : '🔕 Desactivadas' }}
+          </div>
+        </div>
+        <ion-button size="small" fill="solid" color="primary" (click)="openNotifSettings()">
+          Configurar
+        </ion-button>
+      </div>
+      <ion-button size="small" fill="outline" color="medium" (click)="sendTestNotification()">
+        🔔 Enviar notificación de prueba
+      </ion-button>
+    </div>
+
+    <!-- ════ Datos ════ -->
+    <div class="panel">
+      <h3>Datos</h3>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <ion-button size="small" fill="solid" color="primary" (click)="exportData()">Exportar JSON</ion-button>
+        <ion-button size="small" fill="clear" color="medium" (click)="importData()">Importar JSON</ion-button>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+        <ion-button size="small" fill="clear" color="medium" (click)="openGistConfig()">☁️ Gist config</ion-button>
+        <ion-button size="small" fill="clear" color="medium" (click)="cloudLoad()">⬇️ Cargar</ion-button>
+        <ion-button size="small" fill="solid" color="primary" (click)="cloudSave()">⬆️ Guardar</ion-button>
+      </div>
+    </div>
+
+    <!-- ════ Zona peligrosa ════ -->
+    <div class="danger-zone">
+      <h3>⚠ Zona peligrosa</h3>
+      <div style="font-size:13px; color:var(--color-danger); margin-bottom:12px; line-height:1.5;">
+        Borra todos los nudos, metas y configuración. <b>No se puede deshacer.</b>
+      </div>
+      <ion-button fill="solid" color="danger" (click)="resetAll()">🧨 Reset total</ion-button>
+    </div>
+
+    <!-- Espacio inferior -->
+    <div style="height:80px;"></div>
+
+  </div>
+</ion-content>

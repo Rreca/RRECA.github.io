@@ -1,0 +1,106 @@
+<ion-header>
+  <!-- v2 -->
+  <ion-toolbar>
+    <ion-title>Capturar nudo</ion-title>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="!systemFullMessage" fill="solid" color="primary"
+        style="--border-radius: 999px; font-weight: 700; font-size: 13px;"
+        (click)="submit()">
+        Crear
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="padding: 16px;">
+
+    <!-- Sistema lleno -->
+    <div *ngIf="systemFullMessage" class="notice" style="border-left: 3px solid var(--color-danger);">
+      {{ systemFullMessage }}
+    </div>
+
+    <div *ngIf="!systemFullMessage">
+
+      <div class="notice">
+        Regla: si hay <b>EN PROGRESO</b> o ya tenés <b>3 DESBLOQUEABLES</b>, no podés capturar.
+      </div>
+
+      <!-- Título -->
+      <div class="field">
+        <label>Título</label>
+        <input [(ngModel)]="title" placeholder="Ej: pagar impuesto, llamar al médico..." class="ion-input-native" />
+      </div>
+
+      <!-- Contexto -->
+      <div class="field">
+        <label>Contexto</label>
+        <select [(ngModel)]="contextPick" class="ion-select-native">
+          <option value="AUTO">Auto-detectar</option>
+          <option value="HOME">🏠 Casa</option>
+          <option value="STREET">🚶 Calle</option>
+          <option value="WORK">💼 Trabajo</option>
+          <option value="ANY">🌐 General</option>
+        </select>
+      </div>
+
+      <!-- Motivo -->
+      <div class="field">
+        <label>Motivo del bloqueo</label>
+        <select [(ngModel)]="blockReason" (ngModelChange)="onReasonChange()" class="ion-select-native">
+          <option value="NO_START">No sé por dónde empezar</option>
+          <option value="LAZINESS">Pereza</option>
+          <option value="FEAR">Miedo</option>
+          <option value="EXTERNAL">Depende de un externo</option>
+          <option value="NOT_TODAY">No hoy</option>
+        </select>
+      </div>
+
+      <!-- Próximo paso -->
+      <div *ngIf="showNextStep" class="field">
+        <label>Próximo paso (obligatorio)</label>
+        <input [(ngModel)]="nextStep" placeholder="Ej: abrir la web y buscar el trámite" class="ion-input-native" />
+      </div>
+
+      <!-- Minutos estimados -->
+      <div *ngIf="showEstMinutes" class="field">
+        <label>Minutos estimados (máx 5)</label>
+        <input type="number" [(ngModel)]="estMinutes" min="1" max="60" class="ion-input-native" />
+      </div>
+
+      <!-- Espera externa -->
+      <div *ngIf="showExternalWait" class="field">
+        <label>Espera externa (obligatorio)</label>
+        <input [(ngModel)]="externalWait" placeholder="Ej: respuesta del banco / turno" class="ion-input-native" />
+      </div>
+
+      <!-- Fricción / Impacto -->
+      <div style="display: flex; gap: 16px;">
+        <div class="field" style="flex: 1;">
+          <label>Fricción (1–5)</label>
+          <input type="number" [(ngModel)]="friction" min="1" max="5" class="ion-input-native" />
+        </div>
+        <div class="field" style="flex: 1;">
+          <label>Impacto (1–5)</label>
+          <input type="number" [(ngModel)]="impact" min="1" max="5" class="ion-input-native" />
+        </div>
+      </div>
+
+      <!-- Botón Crear al fondo (accesibilidad / UX) -->
+      <div style="margin-top: 24px;">
+        <ion-button expand="block" fill="solid" color="primary"
+          style="--border-radius: 14px; font-weight: 700;"
+          (click)="submit()">
+          Crear nudo
+        </ion-button>
+      </div>
+
+    </div>
+
+    <!-- Si sistema lleno -->
+    <div *ngIf="systemFullMessage" style="margin-top: 16px;">
+      <ion-button expand="block" fill="outline" (click)="dismiss()">Cerrar</ion-button>
+    </div>
+
+  </div>
+</ion-content>

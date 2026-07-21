@@ -1,0 +1,92 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()" style="--color: var(--color-gray-400); font-size: 20px; font-weight: 300;">
+        ✕
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Editar nudo</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="solid" color="primary"
+        style="--border-radius: 999px; font-weight: 700; font-size: 13px;"
+        (click)="save()">
+        Guardar
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="padding: 16px;">
+
+    <!-- Título -->
+    <div class="field">
+      <label>Título</label>
+      <input [(ngModel)]="title" class="ion-input-native" />
+    </div>
+
+    <!-- Contexto -->
+    <div class="field">
+      <label>Contexto</label>
+      <select [(ngModel)]="contextPick" class="ion-select-native">
+        <option value="AUTO">Auto (heurística)</option>
+        <option value="HOME">🏠 Casa</option>
+        <option value="STREET">🚶 Calle</option>
+        <option value="WORK">💼 Trabajo</option>
+        <option value="ANY">🌐 General</option>
+      </select>
+    </div>
+
+    <!-- Motivo del bloqueo -->
+    <div class="field">
+      <label>Motivo del bloqueo</label>
+      <select [(ngModel)]="blockReason" (ngModelChange)="onReasonChange()" class="ion-select-native">
+        <option value="NO_START">No sé por dónde empezar</option>
+        <option value="LAZINESS">Pereza</option>
+        <option value="FEAR">Miedo</option>
+        <option value="EXTERNAL">Depende de un externo</option>
+        <option value="NOT_TODAY">No hoy</option>
+      </select>
+    </div>
+
+    <!-- Próximo paso -->
+    <div *ngIf="showNextStep" class="field">
+      <label>Próximo paso (obligatorio)</label>
+      <input [(ngModel)]="nextStep" placeholder="Ej: abrir la web y buscar el trámite" class="ion-input-native" />
+    </div>
+
+    <!-- Minutos estimados -->
+    <div *ngIf="showEstMinutes" class="field">
+      <label>Minutos estimados (máx 5)</label>
+      <input type="number" [(ngModel)]="estMinutes" min="1" max="60" class="ion-input-native" />
+    </div>
+
+    <!-- Espera externa -->
+    <div *ngIf="showExternalWait" class="field">
+      <label>Espera externa (obligatorio)</label>
+      <input [(ngModel)]="externalWait" placeholder="Ej: respuesta del banco / turno" class="ion-input-native" />
+    </div>
+
+    <!-- Fricción / Impacto -->
+    <div style="display: flex; gap: 16px;">
+      <div class="field" style="flex: 1;">
+        <label>Fricción (1–5)</label>
+        <input type="number" min="1" max="5" [(ngModel)]="friction" class="ion-input-native" />
+      </div>
+      <div class="field" style="flex: 1;">
+        <label>Impacto (1–5)</label>
+        <input type="number" min="1" max="5" [(ngModel)]="impact" class="ion-input-native" />
+      </div>
+    </div>
+
+    <!-- Botón guardar al fondo -->
+    <div style="margin-top: 24px;">
+      <ion-button expand="block" fill="solid" color="primary"
+        style="--border-radius: 14px; font-weight: 700;"
+        (click)="save()">
+        Guardar cambios
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>

@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Detalle</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="knot">
+  <div style="padding: 16px;">
+
+    <h3>{{ knot.title }}</h3>
+
+    <div>
+      <span class="badge" [ngClass]="knot.status.toLowerCase()">{{ statusLabel }}</span>
+    </div>
+
+    <div class="notice">
+      <b>Motivo:</b> {{ reasonLabel }}<br/>
+      <b>Fricción:</b> {{ friction }} · <b>Impacto:</b> {{ impact }}<br/>
+      <b>Sugerencia:</b> {{ score }}
+    </div>
+
+    <div *ngIf="knot.status === 'ARCHIVED'" class="notice">
+      <b>Archivado por:</b> {{ knot.archiveReason }}<br/>
+      <b>Cuándo:</b> {{ timeAgo(knot.archivedAt) }}
+    </div>
+
+    <div *ngIf="knot.nextStep"><b>Próximo paso:</b> {{ knot.nextStep }}</div>
+    <div *ngIf="knot.estMinutes"><b>Minutos estimados:</b> {{ knot.estMinutes }}</div>
+    <div *ngIf="knot.externalWait"><b>Espera externa:</b> {{ knot.externalWait }}</div>
+    <div *ngIf="knot.doneAt"><b>Hecho:</b> {{ timeAgo(knot.doneAt) }}</div>
+
+    <hr/>
+
+    <!-- Contexto -->
+    <div class="panel" style="background:white; border:1px solid #dfe6ee; border-radius:12px; padding:12px;">
+      <h3 style="margin-top:0;">Contexto</h3>
+      <div class="hint">
+        Actual:
+        <span class="badge" [ngClass]="ctx.contextBadgeClass(ctx.getKnotContext(knot))">
+          {{ ctx.contextIcon(ctx.getKnotContext(knot)) }} {{ ctx.contextLabel(ctx.getKnotContext(knot)) }}
+        </span>
+        ({{ ctx.getContextSource(knot) === 'MANUAL' ? 'manual' : 'auto' }})
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+        <select [(ngModel)]="contextPick" class="ion-select-native">
+          <option value="AUTO">Auto (heurística/heredar)</option>
+          <option value="HOME">🏠 Casa</option>
+          <option value="STREET">🚶 Calle</option>
+          <option value="WORK">💼 Trabajo</option>
+          <option value="ANY">🌐 General</option>
+        </select>
+        <ion-button size="small" fill="solid" color="primary" (click)="saveContext()">Guardar</ion-button>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+      <ion-button *ngIf="knot.status === 'ARCHIVED'" fill="solid" color="primary" (click)="restoreArchived()">
+        Restaurar como ALGÚN DÍA
+      </ion-button>
+      <ion-button fill="outline" color="danger" (click)="deleteKnot()">Eliminar</ion-button>
+    </div>
+
+    <hr/>
+
+    <div class="hint"><b>Creado:</b> {{ timeAgo(knot.createdAt) }}</div>
+    <div class="hint"><b>Actualizado:</b> {{ timeAgo(knot.updatedAt) }}</div>
+    <div class="hint"><b>Último toque:</b> {{ timeAgo(knot.lastTouchedAt) }}</div>
+
+  </div>
+</ion-content>

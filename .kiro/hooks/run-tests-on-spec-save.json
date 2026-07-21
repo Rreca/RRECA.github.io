@@ -1,0 +1,16 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Run Tests on Spec Save",
+      "trigger": "PostFileSave",
+      "description": "Corre ng test en modo headless cada vez que se guarda un archivo .spec.ts",
+      "matcher": "\\.spec\\.ts$",
+      "action": {
+        "type": "command",
+        "command": "cd c:\\nudos-ionic && nvm use 22 && npx ng test --watch=false --browsers=ChromeHeadless 2>&1",
+        "timeout": 120
+      }
+    }
+  ]
+}

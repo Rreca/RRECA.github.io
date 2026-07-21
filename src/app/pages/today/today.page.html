@@ -1,0 +1,147 @@
+<ion-content #content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div style="padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 60px); max-width: 680px; margin: 0 auto;">
+
+    <!-- ── Indicador de meta ── -->
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+      <div>
+        <div style="font-size:22px; font-weight:900; color:var(--color-gray-900); letter-spacing:-0.02em; line-height:1;">
+          {{ goalMet ? '✅ Meta cumplida' : 'Hoy' }}
+        </div>
+        <div style="font-size:13px; color:var(--color-gray-400); margin-top:3px;">
+          {{ goalMet ? 'No negocies la cadena.' : marqueeText }}
+        </div>
+      </div>
+      <ion-button size="small" fill="clear" (click)="toggleQuickEdit()"
+        style="--color: var(--color-gray-400); font-size:12px;">
+        {{ quickEditHidden ? 'Sliders off' : 'Sliders on' }}
+      </ion-button>
+    </div>
+
+    <!-- ════ EN PROGRESO ════ -->
+    <div id="section-doing" class="section-header">
+      <span class="section-title">🚀 En progreso</span>
+      <span class="section-meta">1 a la vez</span>
+    </div>
+
+    <app-knot-card
+      *ngIf="doingKnot"
+      [knot]="doingKnot"
+      [quickEditHidden]="quickEditHidden"
+      (refresh)="render()">
+    </app-knot-card>
+
+    <div *ngIf="!doingKnot" class="notice">
+      Nada en progreso. Elegí un DESBLOQUEABLE y arrancá.
+    </div>
+
+    <!-- ════ DESBLOQUEABLES ════ -->
+    <div id="section-unlockable" class="section-header" style="margin-top:8px;">
+      <span class="section-title">🔓 Desbloqueables</span>
+      <span class="section-meta">máx 3</span>
+    </div>
+
+    <ng-container *ngIf="unlockables.length; else noUnlockables">
+      <app-knot-card
+        *ngFor="let k of unlockables"
+        [knot]="k"
+        [quickEditHidden]="quickEditHidden"
+        (refresh)="render()">
+      </app-knot-card>
+    </ng-container>
+    <ng-template #noUnlockables>
+      <div class="empty-state">
+        <div class="empty-icon">🔓</div>
+        <div class="empty-title">Sin desbloqueables</div>
+        <div class="empty-sub">Capturá algo nuevo o desbloqueable del backlog.</div>
+      </div>
+    </ng-template>
+
+    <!-- ════ HECHOS (colapsable) ════ -->
+    <details id="section-done" [open]="doneOpen" style="margin-top:8px;"
+      (toggle)="doneOpen = $any($event.target).open">
+      <summary style="list-style:none; cursor:pointer;">
+        <div class="section-header" style="padding-top:12px;">
+          <span class="section-title">✅ Hechos</span>
+          <span class="section-meta">{{ doneKnots.length }} · últimos 7 días</span>
+        </div>
+      </summary>
+
+      <div *ngIf="!doneGroups.length" class="notice">
+        Todavía nada hoy. Con 1 cosa chica ya cambia el día.
+      </div>
+
+      <div *ngFor="let group of doneGroups" class="done-day">
+        <div class="done-day-title">{{ group.label }} · {{ group.items.length }}</div>
+        <div class="done-mini">
+          <span *ngFor="let k of group.items" class="kbd">✅ {{ k.title }}</span>
+        </div>
+      </div>
+    </details>
+
+    <!-- ════ BACKLOG ════ -->
+    <details id="section-backlog" [open]="backlogOpen" style="margin-top:8px;"
+      (toggle)="backlogOpen = $any($event.target).open">
+      <summary style="list-style:none; cursor:pointer;">
+        <div class="section-header" style="padding-top:12px;">
+          <span class="section-title">🗃 Backlog</span>
+          <span class="section-meta">{{ backlog.length }} · bloqueados / algún día</span>
+        </div>
+      </summary>
+
+      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; align-items:center;">
+        <ion-button size="small"
+          [fill]="backlogSort === 'friction' ? 'solid' : 'clear'"
+          [color]="backlogSort === 'friction' ? 'primary' : 'medium'"
+          (click)="setSortMode('friction')">Fricción</ion-button>
+        <ion-button size="small"
+          [fill]="backlogSort === 'impact' ? 'solid' : 'clear'"
+          [color]="backlogSort === 'impact' ? 'primary' : 'medium'"
+          (click)="setSortMode('impact')">Impacto</ion-button>
+        <ion-button size="small"
+          [fill]="backlogSort === 'recent' ? 'solid' : 'clear'"
+          [color]="backlogSort === 'recent' ? 'primary' : 'medium'"
+          (click)="setSortMode('recent')">Reciente</ion-button>
+        <ion-button size="small" fill="clear" color="medium"
+          (click)="toggleSortDir()"
+          style="min-width:32px; --padding-start:6px; --padding-end:6px;">
+          {{ backlogDir === 'desc' ? '↓' : '↑' }}
+        </ion-button>
+      </div>
+
+      <div *ngIf="!backlog.length" class="empty-state">
+        <div class="empty-icon">🎉</div>
+        <div class="empty-title">Backlog vacío</div>
+        <div class="empty-sub">Sistema limpio. Capturá algo nuevo si querés seguir.</div>
+      </div>
+
+      <!-- ALGÚN DÍA -->
+      <ng-container *ngIf="somedayKnots.length">
+        <div class="backlog-group-label someday-label">🗓 Algún día · {{ somedayKnots.length }}</div>
+        <app-knot-card
+          *ngFor="let k of somedayKnots"
+          [knot]="k"
+          [quickEditHidden]="quickEditHidden"
+          (refresh)="render()">
+        </app-knot-card>
+      </ng-container>
+
+      <!-- BLOQUEADOS -->
+      <ng-container *ngIf="blockedKnots.length">
+        <div class="backlog-group-label blocked-label">🔒 Bloqueados · {{ blockedKnots.length }}</div>
+        <app-knot-card
+          *ngFor="let k of blockedKnots"
+          [knot]="k"
+          [quickEditHidden]="quickEditHidden"
+          (refresh)="render()">
+        </app-knot-card>
+      </ng-container>
+    </details>
+
+    <div style="height: 80px;"></div>
+
+  </div>
+</ion-content>

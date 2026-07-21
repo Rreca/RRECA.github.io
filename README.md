@@ -1,2 +1,0 @@
-# RRECAgithub.io
-TEST LIST

@@ -1,0 +1,91 @@
+<ion-card class="nudos-card"
+  [ngClass]="['card-' + knot.status.toLowerCase(), justDone ? 'card-just-done' : '']"
+  (click)="openDetail($event)">
+
+  <!-- Overlay de checkmark al marcar HECHO -->
+  <div *ngIf="justDone" class="done-overlay">
+    <div class="done-check">✅</div>
+  </div>
+
+  <ion-card-content style="padding: 14px 16px;">
+
+    <!-- Fila superior: estado + contexto -->
+    <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+      <span class="badge" [ngClass]="statusClass">{{ statusLabel }}</span>
+      <span class="badge" [ngClass]="knotContextClass">{{ knotContextIcon }} {{ knotContextLabel }}</span>
+      <span *ngIf="scoreLabel" class="badge" [ngClass]="scoreBadgeClass">{{ scoreLabel }}</span>
+      <span style="flex:1"></span>
+      <span class="hint">{{ lastTouched }}</span>
+    </div>
+
+    <!-- Título -->
+    <div class="card-title">{{ knot.title }}</div>
+
+    <!-- Motivo + scores -->
+    <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
+      <span class="kbd">{{ reasonLabel }}</span>
+      <span class="hint">fr {{ friction }} · im {{ impact }} · sg {{ score }}</span>
+    </div>
+
+    <!-- Quick edit sliders -->
+    <div class="quick-edit" *ngIf="!quickEditHidden" (click)="$event.stopPropagation()">
+      <div class="quick-row">
+        <span>Fricción</span>
+        <ion-range min="1" max="5" step="1" snaps="true" [(ngModel)]="friction" (ionChange)="onSliderChange()"></ion-range>
+        <span class="pill">{{ friction }}</span>
+      </div>
+      <div class="quick-row">
+        <span>Impacto</span>
+        <ion-range min="1" max="5" step="1" snaps="true" [(ngModel)]="impact" (ionChange)="onSliderChange()"></ion-range>
+        <span class="pill">{{ impact }}</span>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions" (click)="$event.stopPropagation()">
+
+      <!-- DOING -->
+      <ng-container *ngIf="knot.status === 'DOING'">
+        <ion-button size="small" fill="solid" color="primary" (click)="startTimer($event)">⏱ 5 min</ion-button>
+        <ion-button size="small" fill="clear" (click)="pauseDoing($event)">Pausar</ion-button>
+        <ion-button size="small" fill="solid" color="success" (click)="markDone($event)">✅ Hecho</ion-button>
+      </ng-container>
+
+      <!-- UNLOCKABLE -->
+      <ng-container *ngIf="knot.status === 'UNLOCKABLE'">
+        <ion-button size="small" fill="solid" color="primary" (click)="startDoing($event)">Iniciar</ion-button>
+        <ion-button size="small" fill="clear" (click)="sendToSomeday($event)">Algún día</ion-button>
+        <ion-button size="small" fill="clear" (click)="openSplit($event)">🧩 Dividir</ion-button>
+      </ng-container>
+
+      <!-- SOMEDAY -->
+      <ng-container *ngIf="knot.status === 'SOMEDAY'">
+        <ion-button size="small" fill="solid" color="primary" (click)="openEditSomeday($event)">Editar</ion-button>
+        <ion-button size="small" fill="clear" (click)="convertToUnlockable($event)">🛠 Desbloquear</ion-button>
+        <ion-button size="small" fill="clear" (click)="openSplit($event)">🧩 Dividir</ion-button>
+        <ion-button size="small" fill="clear" color="danger" (click)="deleteKnot($event)">Eliminar</ion-button>
+      </ng-container>
+
+      <!-- BLOCKED -->
+      <ng-container *ngIf="knot.status === 'BLOCKED'">
+        <ion-button size="small" fill="solid" color="primary" (click)="openEditSomeday($event)">Editar</ion-button>
+        <ion-button size="small" fill="clear" (click)="convertToUnlockable($event)">🛠 Desbloquear</ion-button>
+        <ion-button size="small" fill="clear" (click)="openSplit($event)">🧩 Dividir</ion-button>
+        <ion-button size="small" fill="clear" color="danger" (click)="deleteKnot($event)">Eliminar</ion-button>
+      </ng-container>
+
+      <!-- DONE -->
+      <ng-container *ngIf="knot.status === 'DONE'">
+        <ion-button size="small" fill="clear" (click)="openDetail($event)">Ver detalle</ion-button>
+      </ng-container>
+
+      <!-- ARCHIVED -->
+      <ng-container *ngIf="knot.status === 'ARCHIVED'">
+        <ion-button size="small" fill="clear" (click)="openDetail($event)">Ver detalle</ion-button>
+        <ion-button size="small" fill="solid" color="primary" (click)="restoreArchived($event)">Restaurar</ion-button>
+        <ion-button size="small" fill="clear" color="danger" (click)="deleteKnot($event)">Eliminar</ion-button>
+      </ng-container>
+
+    </div>
+  </ion-card-content>
+</ion-card>
