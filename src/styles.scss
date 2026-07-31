@@ -149,6 +149,12 @@ ion-content {
   font-weight: 500;
 }
 
+.kbd-next-step {
+  background: var(--color-blue-50, #eff6ff);
+  color: var(--color-blue-700, #1d4ed8);
+  font-weight: 600;
+}
+
 /* ---- Section header ---- */
 .section-header {
   display: flex;

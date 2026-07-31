@@ -21,6 +21,11 @@
     <!-- Título -->
     <div class="card-title">{{ knot.title }}</div>
 
+    <!-- Próximo paso -->
+    <div *ngIf="knot.nextStep" style="display:flex; align-items:center; gap:6px; margin-top:6px;">
+      <span class="kbd kbd-next-step">🎯 {{ knot.nextStep }}</span>
+    </div>
+
     <!-- Motivo + scores -->
     <div style="display:flex; align-items:center; gap:6px; margin-top:6px;">
       <span class="kbd">{{ reasonLabel }}</span>
