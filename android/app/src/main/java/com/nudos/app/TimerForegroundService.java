@@ -24,11 +24,14 @@ public class TimerForegroundService extends Service {
     private static final int COMPLETION_NOTIFICATION_ID = 1002;
 
     private static TimerPlugin pluginInstance;
+    private static TimerForegroundService instance;
 
     private CountDownTimer countDownTimer;
     private int totalSeconds;
     private int remainingSeconds;
     private String title;
+    private String knotId;
+    private boolean running;
 
     public static void setPluginInstance(TimerPlugin instance) {
         pluginInstance = instance;
@@ -38,9 +41,30 @@ public class TimerForegroundService extends Service {
         return pluginInstance;
     }
 
+    public static TimerForegroundService getInstance() {
+        return instance;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public int getRemainingSeconds() {
+        return remainingSeconds;
+    }
+
+    public int getTotalSeconds() {
+        return totalSeconds;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
+        instance = this;
         createNotificationChannel();
     }
 
@@ -56,6 +80,7 @@ public class TimerForegroundService extends Service {
         if (title == null || title.isEmpty()) {
             title = "Timer de enfoque";
         }
+        knotId = intent.getStringExtra("knot_id");
 
         totalSeconds = seconds;
         remainingSeconds = seconds;
@@ -63,6 +88,8 @@ public class TimerForegroundService extends Service {
         // Build the persistent notification
         Notification notification = buildNotification(remainingSeconds);
         startForeground(NOTIFICATION_ID, notification);
+
+        running = true;
 
         // Start the countdown
         if (countDownTimer != null) {
@@ -89,6 +116,8 @@ public class TimerForegroundService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        running = false;
+        instance = null;
 
         if (countDownTimer != null) {
             countDownTimer.cancel();
@@ -146,12 +175,24 @@ public class TimerForegroundService extends Service {
 
         PendingIntent cancelPendingIntent = buildCancelPendingIntent(secondsLeft);
 
+        // Tap notification to open app in Focus mode
+        Intent openAppIntent = new Intent(this, MainActivity.class);
+        openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        openAppIntent.putExtra("open_focus", true);
+        if (knotId != null) {
+            openAppIntent.putExtra("knot_id", knotId);
+        }
+        PendingIntent openAppPendingIntent = PendingIntent.getActivity(
+                this, 99, openAppIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(title)
                 .setContentText(timeText)
                 .setSmallIcon(android.R.drawable.ic_media_play)
                 .setOngoing(true)
                 .setSilent(true)
+                .setContentIntent(openAppPendingIntent)
                 .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Cancelar", cancelPendingIntent)
                 .build();
     }
@@ -193,10 +234,18 @@ public class TimerForegroundService extends Service {
         String durationText = formatTime(totalSeconds);
         String body = "Sesión de " + durationText + " — " + title;
 
+        // Tap to open app
+        Intent openAppIntent = new Intent(this, MainActivity.class);
+        openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent openAppPendingIntent = PendingIntent.getActivity(
+                this, 100, openAppIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
         Notification notification = new NotificationCompat.Builder(this, COMPLETION_CHANNEL_ID)
                 .setContentTitle("⏰ Timer terminado")
                 .setContentText(body)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentIntent(openAppPendingIntent)
                 .setAutoCancel(true)
                 .build();
 

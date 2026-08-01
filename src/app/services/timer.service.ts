@@ -1,6 +1,7 @@
 import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject, Subscription, interval } from 'rxjs';
 import { StoreService } from './store.service';
+import { Platform } from '@ionic/angular/standalone';
 import TimerPlugin from '../plugins/timer-plugin';
 
 export interface TimerState {
@@ -27,6 +28,7 @@ export class TimerService {
   constructor(
     private store: StoreService,
     private zone: NgZone,
+    private platform: Platform,
   ) {
     TimerPlugin.addListener('timerFinished', (_event) => {
       this.zone.run(() => {
@@ -48,6 +50,45 @@ export class TimerService {
         });
       });
     });
+
+    // Sync with native timer state when app resumes (e.g. opened from widget/notification)
+    if (this.platform.is('android')) {
+      this.platform.resume.subscribe(() => this.syncNativeState());
+      // Also sync on first load
+      this.syncNativeState();
+    }
+  }
+
+  /** Sync local state with running native timer (e.g. started from widget) */
+  private async syncNativeState(): Promise<void> {
+    try {
+      const native = await TimerPlugin.getState();
+      this.zone.run(() => {
+        if (native.running && !this.stateSubject.value.running) {
+          const endAt = Date.now() + native.remainingSeconds * 1000;
+          this.stateSubject.next({
+            running: true,
+            knotId: this.stateSubject.value.knotId, // preserve if known
+            endAt,
+            secondsLeft: native.remainingSeconds,
+            totalSeconds: native.totalSeconds,
+          });
+          this.stopTick();
+          this.tickSub = interval(500).subscribe(() => this.tick());
+        } else if (!native.running && this.stateSubject.value.running) {
+          // Timer finished while app was in background
+          this.stopTick();
+          this.stateSubject.next({
+            ...this.stateSubject.value,
+            running: false,
+            endAt: Date.now() - 1000, // mark as finished in the past
+            secondsLeft: 0,
+          });
+        }
+      });
+    } catch (_) {
+      // Plugin not available (web) — ignore
+    }
   }
 
   get snapshot(): TimerState {

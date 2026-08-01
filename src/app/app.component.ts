@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
 import { NotificationService } from './services/notification.service';
+import { WidgetBridgeService } from './services/widget-bridge.service';
 import { LocalNotifications } from '@capacitor/local-notifications';
 
 @Component({
@@ -18,6 +19,7 @@ export class AppComponent implements OnInit {
   constructor(
     private notif: NotificationService,
     private router: Router,
+    private _widgetBridge: WidgetBridgeService,
   ) {}
 
   async ngOnInit(): Promise<void> {

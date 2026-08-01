@@ -39,9 +39,38 @@
             android:foregroundServiceType="mediaPlayback"
             android:exported="false" />
 
+        <!-- Invisible trampoline Activity to start timer from widget -->
+        <activity
+            android:name=".TimerTrampolineActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:excludeFromRecents="true"
+            android:exported="false" />
+
         <receiver
             android:name=".TimerCancelReceiver"
             android:exported="false" />
+
+        <!-- Widget Provider -->
+        <receiver
+            android:name=".NudosWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/nudos_widget_info" />
+        </receiver>
+
+        <!-- Timer start receiver (widget → service, no Activity) -->
+        <receiver
+            android:name=".WidgetTimerReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.nudos.app.ACTION_WIDGET_START_TIMER" />
+            </intent-filter>
+        </receiver>
     </application>
 
     <!-- Permissions -->

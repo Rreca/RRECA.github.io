@@ -14,9 +14,27 @@ export interface TimerCancelledEvent {
   remainingSeconds: number;
 }
 
+export interface TimerStateResult {
+  running: boolean;
+  remainingSeconds: number;
+  totalSeconds: number;
+  title: string;
+}
+
+export interface PendingFocusResult {
+  pending: boolean;
+  knotId: string;
+}
+
+export interface OpenFocusEvent {
+  knotId: string;
+}
+
 export interface TimerPluginInterface {
   start(options: TimerPluginStartOptions): Promise<void>;
   stop(): Promise<void>;
+  getState(): Promise<TimerStateResult>;
+  consumePendingFocus(): Promise<PendingFocusResult>;
   addListener(
     eventName: 'timerFinished',
     callback: (event: TimerFinishedEvent) => void
@@ -24,6 +42,10 @@ export interface TimerPluginInterface {
   addListener(
     eventName: 'timerCancelled',
     callback: (event: TimerCancelledEvent) => void
+  ): Promise<{ remove: () => Promise<void> }>;
+  addListener(
+    eventName: 'openFocus',
+    callback: (event: OpenFocusEvent) => void
   ): Promise<{ remove: () => Promise<void> }>;
 }
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget dimensions -->
+    <dimen name="widget_min_width">250dp</dimen>
+    <dimen name="widget_min_height">110dp</dimen>
+    <dimen name="widget_padding">12dp</dimen>
+    <dimen name="widget_inner_padding">8dp</dimen>
+    <dimen name="widget_corner_radius">16dp</dimen>
+
+    <!-- Widget text sizes -->
+    <dimen name="widget_text_title">14sp</dimen>
+    <dimen name="widget_text_body">12sp</dimen>
+    <dimen name="widget_text_label">10sp</dimen>
+    <dimen name="widget_text_progress">16sp</dimen>
+
+    <!-- Widget spacing -->
+    <dimen name="widget_section_spacing">8dp</dimen>
+    <dimen name="widget_item_spacing">4dp</dimen>
+
+    <!-- Widget progress bar -->
+    <dimen name="widget_progress_height">6dp</dimen>
+</resources>

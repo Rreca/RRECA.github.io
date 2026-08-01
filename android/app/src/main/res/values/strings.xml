@@ -4,4 +4,12 @@
     <string name="title_activity_main">Nudos</string>
     <string name="package_name">com.nudos.app</string>
     <string name="custom_url_scheme">com.nudos.app</string>
+
+    <!-- Widget strings -->
+    <string name="widget_name">Nudos Widget</string>
+    <string name="widget_no_active_knot">Sin nudo activo</string>
+    <string name="widget_empty_state">Abre Nudos para empezar</string>
+    <string name="widget_no_unlockable">Nada desbloqueable</string>
+    <string name="widget_next_label">Siguiente:</string>
+    <string name="widget_timer_button_desc">Iniciar timer</string>
 </resources>

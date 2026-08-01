@@ -17,7 +17,10 @@ import { ContextService } from '../services/context.service';
 import { ContextFilter } from '../models/knot.model';
 import { CaptureModalComponent } from '../components/capture-modal/capture-modal.component';
 import { GistConfigModalComponent } from '../components/gist-config-modal/gist-config-modal.component';
+import { FocusTimerModalComponent } from '../components/focus-timer-modal/focus-timer-modal.component';
 import { GistSyncService } from '../services/gist-sync.service';
+import TimerPlugin from '../plugins/timer-plugin';
+import { Platform } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-tabs',
@@ -46,6 +49,7 @@ export class TabsComponent implements OnInit, OnDestroy {
     private modal: ModalController,
     private gist: GistSyncService,
     private router: Router,
+    private platform: Platform,
   ) {
     addIcons({ today, barChart, add, cloudUpload, cloudDownload });
   }
@@ -63,10 +67,25 @@ export class TabsComponent implements OnInit, OnDestroy {
       }),
       this.ctx.filter$.subscribe(f => (this.activeFilter = f)),
     );
+
+    // Listen for widget open-focus intent (when app is already running)
+    if (this.platform.is('android')) {
+      TimerPlugin.addListener('openFocus', (event) => {
+        this.openFocusFromWidget(event.knotId);
+      });
+      // Cold start: check multiple times to handle slow Angular bootstrap
+      setTimeout(() => this.checkPendingFocusIntent(), 1500);
+      setTimeout(() => this.checkPendingFocusIntent(), 3000);
+      // And on resume (app was in background)
+      this.platform.resume.subscribe(() => {
+        setTimeout(() => this.checkPendingFocusIntent(), 300);
+      });
+    }
   }
 
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
+    this.focusAlreadyOpened = false;
   }
 
   setFilter(f: string): void {
@@ -93,5 +112,45 @@ export class TabsComponent implements OnInit, OnDestroy {
   async openGistConfig(): Promise<void> {
     const m = await this.modal.create({ component: GistConfigModalComponent });
     await m.present();
+  }
+
+  private async openFocusFromWidget(knotId: string): Promise<void> {
+    const m = await this.modal.create({
+      component: FocusTimerModalComponent,
+      componentProps: { knotId },
+    });
+    await m.present();
+  }
+
+  private focusAlreadyOpened = false;
+  private pendingFocusKnotId: string | null = null;
+
+  private async checkPendingFocusIntent(): Promise<void> {
+    if (this.focusAlreadyOpened) return;
+
+    // Check if we have a saved pending from a previous attempt
+    let knotId = this.pendingFocusKnotId;
+
+    if (!knotId) {
+      try {
+        const result = await TimerPlugin.consumePendingFocus();
+        if (result.pending && result.knotId) {
+          knotId = result.knotId;
+          this.pendingFocusKnotId = knotId;
+        }
+      } catch (_) {
+        return;
+      }
+    }
+
+    if (knotId) {
+      const knot = this.store.getKnotById(knotId);
+      if (knot) {
+        this.focusAlreadyOpened = true;
+        this.pendingFocusKnotId = null;
+        this.openFocusFromWidget(knotId);
+      }
+      // If knot not loaded yet, the next setTimeout will retry with saved knotId
+    }
   }
 }

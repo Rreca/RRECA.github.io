@@ -126,6 +126,7 @@ export class FocusTimerModalComponent implements OnInit, OnDestroy {
   }
 
   dismiss(): void {
+    this.timer.stop('DISMISS_FOCUS');
     this.modal.dismiss();
   }
 
