@@ -17,6 +17,17 @@
         android:gravity="center_vertical"
         android:paddingEnd="@dimen/widget_inner_padding">
 
+        <!-- Date display: e.g. "Sábado, 1 de agosto" -->
+        <TextView
+            android:id="@+id/txt_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/widget_text_secondary"
+            android:textSize="@dimen/widget_text_body"
+            android:layout_marginBottom="4dp"
+            android:maxLines="1"
+            android:singleLine="true" />
+
         <!-- Current knot title -->
         <TextView
             android:id="@+id/txt_current_title"

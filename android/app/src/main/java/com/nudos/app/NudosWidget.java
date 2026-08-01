@@ -9,6 +9,10 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * AppWidgetProvider for the Nudos home screen widget.
  * Displays the current DOING knot, daily progress, and next unlockable knot.
@@ -40,6 +44,14 @@ public class NudosWidget extends AppWidgetProvider {
     private RemoteViews buildRemoteViews(Context context) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_nudos);
         WidgetDataModel data = WidgetDataParser.parse(context);
+
+        // Always show the date in Spanish: "Sábado, 1 de agosto"
+        Locale es = new Locale("es", "ES");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM", es);
+        String dateStr = sdf.format(new Date());
+        // Capitalize first letter
+        dateStr = dateStr.substring(0, 1).toUpperCase() + dateStr.substring(1);
+        views.setTextViewText(R.id.txt_date, dateStr);
 
         if (!data.isValid) {
             // Hide normal sections, show empty state
