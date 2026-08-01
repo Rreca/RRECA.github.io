@@ -116,6 +116,26 @@
       Diseñado para recordar sin molestar. Podés cambiar los horarios cuando quieras.
     </div>
 
+    <!-- Alarma exacta del timer -->
+    <div class="panel" style="margin-top:16px;">
+      <h3>Alarma del Timer</h3>
+      <div style="padding:8px 0;">
+        <div style="font-size:13px; color:var(--color-gray-600); margin-bottom:8px;">
+          Para que la alarma del timer suene exactamente cuando termina (incluso con la app dormida), 
+          necesitás activar dos permisos en tu dispositivo:
+        </div>
+        <div style="font-size:12px; color:var(--color-gray-400); margin-bottom:4px;">
+          ① Apps → Nudos → Alarmas y recordatorios → Activar
+        </div>
+        <div style="font-size:12px; color:var(--color-gray-400); margin-bottom:10px;">
+          ② Batería → Nudos → Sin restricciones
+        </div>
+        <ion-button size="small" fill="outline" color="primary" (click)="openAlarmSettings()">
+          Ver instrucciones
+        </ion-button>
+      </div>
+    </div>
+
     <div style="height:80px;"></div>
   </div>
 </ion-content>

@@ -1,0 +1,193 @@
+.chain-view {
+  padding: 16px;
+}
+
+.chain-timeline {
+  margin-bottom: 24px;
+}
+
+.chain-name {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: #1a1a2e;
+}
+
+.timeline-container {
+  padding-left: 8px;
+}
+
+.timeline-node {
+  cursor: pointer;
+}
+
+.node-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+// Base node circle
+.node-circle {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+// Active node: primary accent color on circle and border, with glow
+.node-active {
+  border-color: var(--ion-color-primary, #3880ff);
+  background: var(--ion-color-primary, #3880ff);
+  box-shadow: 0 0 0 4px rgba(56, 128, 255, 0.2);
+}
+
+// Active dot inside active node circle
+.active-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+// Done node: green background with white checkmark
+.node-done {
+  border-color: #22c55e;
+  background: #22c55e;
+}
+
+.checkmark {
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+// Pending node: gray circle
+.node-pending {
+  border-color: #ccc;
+  background: #f5f5f5;
+}
+
+// Node content area
+.node-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.node-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+
+.node-status {
+  font-size: 12px;
+  color: #666;
+}
+
+// Quick action buttons
+.quick-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+
+  ion-button {
+    --padding-start: 8px;
+    --padding-end: 8px;
+    --padding-top: 2px;
+    --padding-bottom: 2px;
+    height: 26px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
+// Active node text: prominent styling
+.state-active .node-title {
+  color: var(--ion-color-primary, #3880ff);
+  font-weight: 600;
+}
+
+.state-active .node-status {
+  color: var(--ion-color-primary, #3880ff);
+}
+
+// Done node text
+.state-done .node-title {
+  color: #1a1a2e;
+}
+
+.state-done .node-status {
+  color: #22c55e;
+}
+
+// Pending node text: gray
+.state-pending .node-title {
+  color: #999;
+}
+
+.state-pending .node-status {
+  color: #999;
+}
+
+// Connector line between nodes
+.connector-line {
+  width: 2px;
+  height: 16px;
+  background: #ccc;
+  margin-left: 11px;
+  transition: background 0.2s ease;
+}
+
+// All-done chain: green connecting line
+.connector-done {
+  background: #22c55e;
+}
+
+// Completed chain state: all nodes done, no active highlight
+.completed-chain .timeline-node .node-circle {
+  border-color: #22c55e;
+  background: #22c55e;
+}
+
+// Drag handle
+.drag-handle {
+  cursor: grab;
+  font-size: 16px;
+  color: #aaa;
+  user-select: none;
+  touch-action: none;
+  padding: 4px;
+  line-height: 1;
+
+  &:active {
+    cursor: grabbing;
+    color: #666;
+  }
+}
+
+// CDK Drag & Drop
+.cdk-drag-preview {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

@@ -71,3 +71,9 @@
   from { transform: scale(0.3); opacity: 0; }
   to   { transform: scale(1);   opacity: 1; }
 }
+
+/* ── Chain indicator badge ── */
+.kbd-chain {
+  background-color: #e8d4f0;
+  color: #6b21a8;
+}

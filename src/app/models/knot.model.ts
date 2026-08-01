@@ -23,6 +23,8 @@ export interface Knot {
   archivedAt?: number | null;
   archiveReason?: ArchiveReason | null;
   parentId?: string | null;  // id del nudo del que fue dividido (SPLIT)
+  chainId?: string | null;       // references Chain.id
+  chainOrder?: number | null;    // 0-based position within chain
 }
 
 export type KnotPatch = Partial<Knot> & { id: string };

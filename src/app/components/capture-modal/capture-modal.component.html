@@ -86,6 +86,38 @@
         </div>
       </div>
 
+      <!-- Cadena -->
+      <div class="field" style="margin-top: 16px;">
+        <label>Cadena</label>
+        <select [(ngModel)]="chainOption" class="ion-select-native">
+          <option value="none">Sin cadena</option>
+          <option value="new">Crear nueva cadena</option>
+          <option value="existing">Agregar a cadena existente</option>
+        </select>
+      </div>
+
+      <!-- Nueva cadena -->
+      <div *ngIf="chainOption === 'new'" class="field">
+        <label>Nombre de la cadena (1–50 caracteres)</label>
+        <input [(ngModel)]="newChainName" placeholder="Ej: Proceso de mudanza" maxlength="50" class="ion-input-native" />
+        <div *ngIf="chainNameError" class="hint" style="color: var(--color-danger); margin-top: 4px;">{{ chainNameError }}</div>
+      </div>
+
+      <!-- Cadena existente -->
+      <div *ngIf="chainOption === 'existing'" class="field">
+        <div *ngIf="chains.length === 0" class="notice">
+          No hay cadenas disponibles. Seleccioná "Crear nueva cadena" para crear una.
+        </div>
+        <div *ngIf="chains.length > 0">
+          <label>Seleccionar cadena</label>
+          <select [(ngModel)]="selectedChainId" class="ion-select-native">
+            <option [value]="null" disabled>— Elegí una cadena —</option>
+            <option *ngFor="let c of chains" [value]="c.id">{{ c.name }} ({{ getChainKnotCount(c.id) }} nudos)</option>
+          </select>
+          <div *ngIf="chainCapacityError" class="hint" style="color: var(--color-danger); margin-top: 4px;">{{ chainCapacityError }}</div>
+        </div>
+      </div>
+
       <!-- Botón Crear al fondo (accesibilidad / UX) -->
       <div style="margin-top: 24px;">
         <ion-button expand="block" fill="solid" color="primary"

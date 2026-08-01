@@ -83,5 +83,17 @@ export class NotificationsSettingsModalComponent implements OnInit {
     this.modal.dismiss(null, 'saved');
   }
 
+  async openAlarmSettings(): Promise<void> {
+    const a = await this.alert.create({
+      header: 'Alarma exacta del timer',
+      message: 'Para que el timer suene justo cuando termina:\n\n' +
+        '1. Configuración → Apps → Nudos → Alarmas y recordatorios → Activar\n\n' +
+        '2. Configuración → Batería → Nudos → Sin restricciones\n\n' +
+        'Esto evita que Android demore o bloquee la alarma cuando la app está en segundo plano.',
+      buttons: ['Entendido'],
+    });
+    await a.present();
+  }
+
   dismiss(): void { this.modal.dismiss(); }
 }

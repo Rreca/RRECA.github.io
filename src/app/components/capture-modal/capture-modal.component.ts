@@ -10,7 +10,9 @@ import {
 import { StoreService } from '../../services/store.service';
 import { RulesService } from '../../services/rules.service';
 import { ContextService } from '../../services/context.service';
+import { ChainService } from '../../services/chain.service';
 import { Knot, KnotContext, BlockReason } from '../../models/knot.model';
+import { Chain } from '../../models/chain.model';
 import { generateUUID } from '../../utils/utils';
 
 @Component({
@@ -39,12 +41,20 @@ export class CaptureModalComponent implements OnInit {
 
   systemFullMessage = '';
 
+  // Chain selection fields
+  chainOption: 'none' | 'new' | 'existing' = 'none';
+  newChainName = '';
+  selectedChainId: string | null = null;
+  chainNameError = '';
+  chainCapacityError = '';
+
   constructor(
     private modal: ModalController,
     private alert: AlertController,
     private store: StoreService,
     private rules: RulesService,
     private ctx: ContextService,
+    private chainService: ChainService,
   ) {}
 
   ngOnInit(): void {
@@ -66,8 +76,44 @@ export class CaptureModalComponent implements OnInit {
     this.showExternalWait = this.blockReason === 'EXTERNAL';
   }
 
+  get chains(): Chain[] {
+    return this.chainService.getChains().sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  getChainKnotCount(chainId: string): number {
+    return this.chainService.getChainSize(chainId);
+  }
+
   async submit(): Promise<void> {
     if (this.systemFullMessage) return;
+
+    // Chain validation
+    this.chainNameError = '';
+    this.chainCapacityError = '';
+
+    if (this.chainOption === 'new') {
+      const trimmed = this.newChainName.trim();
+      if (trimmed.length === 0) {
+        this.chainNameError = 'El nombre de la cadena no puede estar vacío.';
+        return;
+      }
+      if (trimmed.length > 50) {
+        this.chainNameError = 'El nombre no puede exceder 50 caracteres.';
+        return;
+      }
+    }
+
+    if (this.chainOption === 'existing') {
+      if (!this.selectedChainId) {
+        this.chainCapacityError = 'Seleccioná una cadena.';
+        return;
+      }
+      const count = this.getChainKnotCount(this.selectedChainId);
+      if (count >= 50) {
+        this.chainCapacityError = 'Esta cadena alcanzó su capacidad máxima (50 nudos).';
+        return;
+      }
+    }
 
     try {
       // Resolver contexto
@@ -108,6 +154,15 @@ export class CaptureModalComponent implements OnInit {
 
       const validated = this.rules.validateNewKnot(knot);
       this.store.createKnot(validated);
+
+      // Wire chain association after knot creation
+      if (this.chainOption === 'new') {
+        const chain = this.chainService.createChain(this.newChainName);
+        this.chainService.addKnotToChain(validated.id, chain.id);
+      } else if (this.chainOption === 'existing' && this.selectedChainId) {
+        this.chainService.addKnotToChain(validated.id, this.selectedChainId);
+      }
+
       await this.modal.dismiss(null, 'confirm');
     } catch (err) {
       const a = await this.alert.create({

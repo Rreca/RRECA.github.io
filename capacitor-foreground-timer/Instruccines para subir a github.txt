@@ -1,0 +1,10 @@
+Para publicar en GitHub:
+
+1-Creá un repo nuevo en GitHub (ej: RRECA/capacitor-foreground-timer)
+2-Desde la terminal:
+cd capacitor-foreground-timer
+git init
+git add .
+git commit -m "Initial release: Capacitor Foreground Timer plugin"
+git remote add origin https://github.com/RRECA/capacitor-foreground-timer.git
+git push -u origin main

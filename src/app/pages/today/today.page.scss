@@ -7,3 +7,23 @@ details > summary {
 details > summary::-webkit-details-marker {
   display: none;
 }
+
+.view-toggle {
+  display: inline-flex;
+  gap: 4px;
+  margin-bottom: 16px;
+
+  ion-button {
+    --border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: none;
+    --padding-start: 10px;
+    --padding-end: 10px;
+    height: 30px;
+  }
+}
+
+.unchained-section {
+  margin-top: 16px;
+}

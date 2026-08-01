@@ -9,11 +9,14 @@ import {
 } from '@ionic/angular/standalone';
 
 import { Knot } from '../../models/knot.model';
+import { Chain } from '../../models/chain.model';
 import { StoreService } from '../../services/store.service';
 import { RulesService } from '../../services/rules.service';
 import { ContextService } from '../../services/context.service';
 import { GoalService } from '../../services/goal.service';
+import { ChainService } from '../../services/chain.service';
 import { KnotCardComponent } from '../../components/knot-card/knot-card.component';
+import { ChainViewComponent } from '../../components/chain-view/chain-view.component';
 
 type BacklogSort = 'friction' | 'impact' | 'recent';
 
@@ -37,10 +40,15 @@ const SECTION_IDS: Record<string, string> = {
     IonItem, IonLabel, IonList, IonNote,
     IonButton, IonButtons,
     KnotCardComponent,
+    ChainViewComponent,
   ],
 })
 export class TodayPage implements OnInit, OnDestroy {
   @ViewChild(IonContent, { static: false }) ionContent!: IonContent;
+
+  viewMode: 'list' | 'chain' = 'list';
+  chains: Chain[] = [];
+  unchainedKnots: Knot[] = [];
 
   doingKnot: Knot | null = null;
   unlockables: Knot[] = [];
@@ -64,20 +72,28 @@ export class TodayPage implements OnInit, OnDestroy {
 
   private sub!: Subscription;
   private filterSub!: Subscription;
+  private chainSub!: Subscription;
 
   constructor(
     private store: StoreService,
     private rules: RulesService,
     private ctx: ContextService,
     private goal: GoalService,
+    private chainService: ChainService,
     private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
     this.ctx.migrateKnotContextsOnce();
     this.loadQuickEditPref();
+    this.loadViewModePref();
     this.sub = this.store.knots$.subscribe(() => this.render());
     this.filterSub = this.ctx.filter$.subscribe(() => this.render());
+    this.chainSub = this.chainService.chains$.subscribe((chains: Chain[]) => {
+      this.chains = [...chains]
+        .filter(c => this.chainService.getChainSize(c.id) > 0)
+        .sort((a, b) => b.createdAt - a.createdAt);
+    });
     this.render();
 
     // Scroll a sección si viene de Análisis
@@ -97,6 +113,7 @@ export class TodayPage implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.sub?.unsubscribe();
     this.filterSub?.unsubscribe();
+    this.chainSub?.unsubscribe();
   }
 
   scrollToSection(status: string): void {
@@ -145,6 +162,14 @@ export class TodayPage implements OnInit, OnDestroy {
 
     this.backlog = bl;
     this.updateMarquee();
+
+    // Compute unchained knots for chain view
+    this.unchainedKnots = visible.filter(k => !k.chainId);
+
+    // Refresh chains (filter out any that became empty)
+    this.chains = this.chainService.getChains()
+      .filter(c => this.chainService.getChainSize(c.id) > 0)
+      .sort((a, b) => b.createdAt - a.createdAt);
   }
 
   private buildDoneGroups(): void {
@@ -193,6 +218,16 @@ export class TodayPage implements OnInit, OnDestroy {
 
   private loadQuickEditPref(): void {
     this.quickEditHidden = localStorage.getItem('nudos_ui_quick_edit_hidden_v1') === '1';
+  }
+
+  setViewMode(mode: 'list' | 'chain'): void {
+    this.viewMode = mode;
+    localStorage.setItem('nudos_ui_view_mode', mode);
+  }
+
+  private loadViewModePref(): void {
+    const stored = localStorage.getItem('nudos_ui_view_mode');
+    this.viewMode = (stored === 'list' || stored === 'chain') ? stored : 'list';
   }
 
   handleRefresh(event: CustomEvent): void {

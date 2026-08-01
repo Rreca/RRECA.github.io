@@ -13,6 +13,7 @@ import {
 import { Knot } from '../../models/knot.model';
 import { RulesService } from '../../services/rules.service';
 import { StoreService } from '../../services/store.service';
+import { ChainService } from '../../services/chain.service';
 import { ContextService } from '../../services/context.service';
 import { TimerService } from '../../services/timer.service';
 import { formatTimeAgo } from '../../utils/utils';
@@ -47,6 +48,7 @@ export class KnotCardComponent implements OnInit {
   constructor(
     private rules: RulesService,
     private store: StoreService,
+    private chainService: ChainService,
     public ctx: ContextService,
     private timer: TimerService,
     private modal: ModalController,
@@ -102,6 +104,21 @@ export class KnotCardComponent implements OnInit {
   get knotContextLabel(): string { return this.ctx.contextLabel(this.knotContext); }
   get knotContextClass(): string { return this.ctx.contextBadgeClass(this.knotContext); }
   get lastTouched(): string { return formatTimeAgo(this.knot.lastTouchedAt); }
+
+  get chainIndicator(): { position: number; total: number; name: string } | null {
+    if (!this.knot.chainId) return null;
+    const chain = this.chainService.getChainById(this.knot.chainId);
+    if (!chain) return null;
+    const total = this.chainService.getChainSize(this.knot.chainId);
+    const position = (this.knot.chainOrder ?? 0) + 1; // 1-based
+    return { position, total, name: chain.name };
+  }
+
+  get chainNameTruncated(): string {
+    const info = this.chainIndicator;
+    if (!info) return '';
+    return info.name.length > 20 ? info.name.substring(0, 20) + '…' : info.name;
+  }
 
   // ─── Sliders ────────────────────────────────────────────────────────────
 

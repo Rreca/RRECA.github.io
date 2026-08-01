@@ -1,0 +1,57 @@
+<div class="chain-view">
+  <div *ngFor="let chain of chains" class="chain-timeline">
+    <h3 class="chain-name">{{ chain.name }}</h3>
+    <div class="timeline-container"
+         [ngClass]="{ 'completed-chain': isAllDone(chain.id) }"
+         cdkDropList
+         [cdkDropListData]="getKnots(chain.id)"
+         (cdkDropListDropped)="onDrop(chain.id, $event)">
+      <div *ngFor="let knot of getKnots(chain.id); let i = index; let last = last"
+           cdkDrag
+           [cdkDragDisabled]="getKnots(chain.id).length < 2"
+           [ngClass]="'timeline-node state-' + getNodeState(knot, chain.id)"
+           (click)="onNodeTap(knot.id)">
+        <div class="node-row">
+          <!-- Drag handle: only visible if chain has 2+ knots -->
+          <span *ngIf="getKnots(chain.id).length >= 2"
+                class="drag-handle"
+                cdkDragHandle
+                (click)="$event.stopPropagation()">⠿</span>
+          <div [ngClass]="'node-circle node-' + getNodeState(knot, chain.id)">
+            <span *ngIf="getNodeState(knot, chain.id) === 'done'" class="checkmark">✓</span>
+            <span *ngIf="getNodeState(knot, chain.id) === 'active'" class="active-dot"></span>
+          </div>
+          <div class="node-content">
+            <span class="node-title">{{ knot.title }}</span>
+            <span class="node-status">{{ getStatusLabel(knot.status) }}</span>
+            <div class="quick-actions" *ngIf="knot.status === 'UNLOCKABLE' || knot.status === 'DOING'">
+              <ion-button *ngIf="knot.status === 'UNLOCKABLE'"
+                          size="small"
+                          fill="outline"
+                          color="primary"
+                          (click)="startKnot(knot.id, $event)">
+                Empezar
+              </ion-button>
+              <ion-button *ngIf="knot.status === 'DOING'"
+                          size="small"
+                          fill="outline"
+                          color="success"
+                          (click)="markDone(knot.id, $event)">
+                Hecho
+              </ion-button>
+              <ion-button *ngIf="knot.status === 'DOING'"
+                          size="small"
+                          fill="outline"
+                          color="tertiary"
+                          (click)="openTimer(knot.id, $event)">
+                Timer
+              </ion-button>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="!last && getKnots(chain.id).length > 1"
+             [ngClass]="{ 'connector-line': true, 'connector-done': isAllDone(chain.id) }"></div>
+      </div>
+    </div>
+  </div>
+</div>

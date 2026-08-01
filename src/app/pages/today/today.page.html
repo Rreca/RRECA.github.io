@@ -21,6 +21,21 @@
       </ion-button>
     </div>
 
+    <!-- ── Toggle vista ── -->
+    <div class="view-toggle">
+      <ion-button size="small"
+        [fill]="viewMode === 'list' ? 'solid' : 'clear'"
+        [color]="viewMode === 'list' ? 'primary' : 'medium'"
+        (click)="setViewMode('list')">Vista lista</ion-button>
+      <ion-button size="small"
+        [fill]="viewMode === 'chain' ? 'solid' : 'clear'"
+        [color]="viewMode === 'chain' ? 'primary' : 'medium'"
+        (click)="setViewMode('chain')">Vista secuencia</ion-button>
+    </div>
+
+    <!-- ════ VISTA LISTA ════ -->
+    <ng-container *ngIf="viewMode === 'list'">
+
     <!-- ════ EN PROGRESO ════ -->
     <div id="section-doing" class="section-header">
       <span class="section-title">🚀 En progreso</span>
@@ -140,6 +155,41 @@
         </app-knot-card>
       </ng-container>
     </details>
+
+    </ng-container><!-- end viewMode === 'list' -->
+
+    <!-- ════ VISTA SECUENCIA (CHAIN VIEW) ════ -->
+    <ng-container *ngIf="viewMode === 'chain'">
+
+      <!-- Empty state: no chains AND no unchained knots -->
+      <div *ngIf="!chains.length && !unchainedKnots.length" class="empty-state">
+        <div class="empty-icon">🔗</div>
+        <div class="empty-title">No hay cadenas todavía</div>
+        <div class="empty-sub">Creá una cadena al capturar un nuevo nudo (botón + → seleccioná 'Crear nueva cadena').</div>
+      </div>
+
+      <!-- Chain timelines -->
+      <app-chain-view
+        *ngIf="chains.length"
+        [chains]="chains"
+        (refresh)="render()">
+      </app-chain-view>
+
+      <!-- Unchained knots section -->
+      <div *ngIf="unchainedKnots.length" class="unchained-section">
+        <div class="section-header">
+          <span class="section-title">🔗 Sin cadena</span>
+          <span class="section-meta">{{ unchainedKnots.length }}</span>
+        </div>
+        <app-knot-card
+          *ngFor="let k of unchainedKnots"
+          [knot]="k"
+          [quickEditHidden]="quickEditHidden"
+          (refresh)="render()">
+        </app-knot-card>
+      </div>
+
+    </ng-container><!-- end viewMode === 'chain' -->
 
     <div style="height: 80px;"></div>
 

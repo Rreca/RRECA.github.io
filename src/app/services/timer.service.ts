@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, interval, Subscription } from 'rxjs';
+import { Injectable, NgZone } from '@angular/core';
+import { BehaviorSubject, Subscription, interval } from 'rxjs';
 import { StoreService } from './store.service';
+import TimerPlugin from '../plugins/timer-plugin';
 
 export interface TimerState {
   running: boolean;
@@ -23,7 +24,31 @@ export class TimerService {
 
   private tickSub: Subscription | null = null;
 
-  constructor(private store: StoreService) {}
+  constructor(
+    private store: StoreService,
+    private zone: NgZone,
+  ) {
+    TimerPlugin.addListener('timerFinished', (_event) => {
+      this.zone.run(() => {
+        this.stopTick();
+        this.stateSubject.next({
+          ...this.stateSubject.value,
+          running: false,
+          secondsLeft: 0,
+        });
+      });
+    });
+    TimerPlugin.addListener('timerCancelled', (event) => {
+      this.zone.run(() => {
+        this.stopTick();
+        this.stateSubject.next({
+          ...this.stateSubject.value,
+          running: false,
+          secondsLeft: event.remainingSeconds,
+        });
+      });
+    });
+  }
 
   get snapshot(): TimerState {
     return this.stateSubject.value;
@@ -38,15 +63,19 @@ export class TimerService {
     this.stateSubject.next({ running: true, knotId, endAt, secondsLeft: totalSeconds, totalSeconds });
     this.store.logEvent('TIMER_5MIN_START', { knotId, minutes });
 
-    this.tickSub = interval(300).subscribe(() => this.tick());
+    const knot = this.store.getKnotById(knotId);
+    TimerPlugin.start({ seconds: minutes * 60, title: knot?.title ?? 'Timer de enfoque' });
+
+    // Tick local para actualizar la UI (la alarma real la maneja el nativo)
+    this.tickSub = interval(500).subscribe(() => this.tick());
   }
 
   stop(reason = 'STOP'): void {
-    this.tickSub?.unsubscribe();
-    this.tickSub = null;
+    this.stopTick();
 
     if (this.stateSubject.value.running) {
       this.store.logEvent('TIMER_5MIN_STOP', { reason });
+      TimerPlugin.stop();
     }
 
     this.stateSubject.next({
@@ -66,12 +95,11 @@ export class TimerService {
     const secondsLeft = Math.ceil(left / 1000);
 
     this.stateSubject.next({ ...this.stateSubject.value, secondsLeft });
+  }
 
-    if (secondsLeft <= 0) {
-      this.tickSub?.unsubscribe();
-      this.tickSub = null;
-      this.stateSubject.next({ ...this.stateSubject.value, running: false });
-    }
+  private stopTick(): void {
+    this.tickSub?.unsubscribe();
+    this.tickSub = null;
   }
 
   /** Formatea MM:SS */

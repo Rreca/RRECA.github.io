@@ -57,6 +57,27 @@
       </div>
     </div>
 
+    <!-- Cadena -->
+    <div *ngIf="knot.chainId && chainInfo" class="panel" style="background:white; border:1px solid #dfe6ee; border-radius:12px; padding:12px; margin-top:12px;">
+      <h3 style="margin-top:0;">Cadena</h3>
+      <div>Paso {{ chainInfo.position }} de {{ chainInfo.total }} en: <b>{{ chainInfo.name }}</b></div>
+      <div style="margin-top:8px;">
+        <ion-button size="small" fill="outline" color="danger" (click)="removeFromChain()">Quitar de cadena</ion-button>
+      </div>
+    </div>
+
+    <!-- Mover/asignar a cadena -->
+    <div *ngIf="availableChains.length > 0" class="panel" style="background:white; border:1px solid #dfe6ee; border-radius:12px; padding:12px; margin-top:12px;">
+      <h3 style="margin-top:0;">{{ knot.chainId ? 'Mover a otra cadena' : 'Asignar a cadena' }}</h3>
+      <select [(ngModel)]="targetChainId" class="ion-select-native">
+        <option [value]="''" disabled>— Elegí una cadena —</option>
+        <option *ngFor="let c of availableChains" [value]="c.id">{{ c.name }} ({{ getChainKnotCount(c.id) }} nudos)</option>
+      </select>
+      <ion-button *ngIf="targetChainId" size="small" fill="solid" color="primary" (click)="assignToChain(targetChainId)" style="margin-top:8px;">
+        {{ knot.chainId ? 'Mover' : 'Asignar' }}
+      </ion-button>
+    </div>
+
     <!-- Acciones -->
     <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
       <ion-button *ngIf="knot.status === 'ARCHIVED'" fill="solid" color="primary" (click)="restoreArchived()">

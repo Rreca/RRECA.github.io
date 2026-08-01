@@ -182,9 +182,9 @@ export class NotificationService {
         body,
         channelId: CHANNEL_ID,
         schedule:  { at, repeats: false },
-        smallIcon: 'ic_stat_nudos',   // ícono monocromático para el tray
+        smallIcon: 'ic_stat_nudos',
+        largeIcon: 'ic_launcher',
         iconColor: '#2563EB',
-        // Abrir la app al tocar la notificación
         extra: { action: 'open' },
       }],
     });
@@ -316,4 +316,5 @@ export class NotificationService {
       console.error('sendTestNotification error:', e);
     }
   }
+
 }

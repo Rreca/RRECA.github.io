@@ -7,9 +7,11 @@ import {
 } from '@ionic/angular/standalone';
 
 import { Knot } from '../../models/knot.model';
+import { Chain } from '../../models/chain.model';
 import { StoreService } from '../../services/store.service';
 import { RulesService } from '../../services/rules.service';
 import { ContextService } from '../../services/context.service';
+import { ChainService } from '../../services/chain.service';
 import { formatTimeAgo } from '../../utils/utils';
 
 @Component({
@@ -27,6 +29,7 @@ export class KnotDetailModalComponent implements OnInit {
 
   knot!: Knot;
   contextPick = 'AUTO';
+  targetChainId = '';
 
   constructor(
     private modal: ModalController,
@@ -34,6 +37,7 @@ export class KnotDetailModalComponent implements OnInit {
     private store: StoreService,
     private rules: RulesService,
     public ctx: ContextService,
+    private chainService: ChainService,
   ) {}
 
   ngOnInit(): void {
@@ -95,6 +99,52 @@ export class KnotDetailModalComponent implements OnInit {
 
   restoreArchived(): void {
     this.rules.restoreArchivedToSomeday(this.knot.id);
+    this.load();
+  }
+
+  // ─── Chain actions ─────────────────────────────────────────────────────
+
+  get chainInfo(): { name: string; position: number; total: number } | null {
+    if (!this.knot.chainId) return null;
+    const chain = this.chainService.getChainById(this.knot.chainId);
+    if (!chain) return null;
+    const total = this.chainService.getChainSize(this.knot.chainId);
+    const position = (this.knot.chainOrder ?? 0) + 1; // 1-based display
+    return { name: chain.name, position, total };
+  }
+
+  get availableChains(): Chain[] {
+    return this.chainService.getChains()
+      .filter(c => c.id !== this.knot.chainId)
+      .sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  getChainKnotCount(chainId: string): number {
+    return this.chainService.getChainSize(chainId);
+  }
+
+  async removeFromChain(): Promise<void> {
+    const a = await this.alert.create({
+      header: '¿Quitar de cadena?',
+      message: `Se quitará este nudo de la cadena "${this.chainInfo?.name}". El nudo seguirá existiendo de forma independiente.`,
+      buttons: [
+        { text: 'Quitar', role: 'destructive', handler: () => {
+          this.chainService.removeKnotFromChain(this.knot.id);
+          this.load();
+        }},
+        { text: 'Cancelar', role: 'cancel' },
+      ],
+    });
+    await a.present();
+  }
+
+  async assignToChain(chainId: string): Promise<void> {
+    if (this.knot.chainId) {
+      this.chainService.moveKnotToChain(this.knot.id, chainId);
+    } else {
+      this.chainService.addKnotToChain(this.knot.id, chainId);
+    }
+    this.targetChainId = '';
     this.load();
   }
 

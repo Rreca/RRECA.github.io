@@ -134,35 +134,14 @@ export class FocusTimerModalComponent implements OnInit, OnDestroy {
   private onTimerFinished(): void {
     // Vibración: patrón corto-corto-largo
     if ('vibrate' in navigator) navigator.vibrate([100, 80, 100, 80, 300]);
-
-    // Sonido: beep sintético via Web Audio API
-    this.playBeep();
   }
 
   private playBeep(): void {
     try {
-      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-
-      const beep = (startTime: number, freq: number, duration: number, gain: number) => {
-        const osc = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-        osc.connect(gainNode);
-        gainNode.connect(ctx.destination);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, startTime);
-        gainNode.gain.setValueAtTime(0, startTime);
-        gainNode.gain.linearRampToValueAtTime(gain, startTime + 0.01);
-        gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
-        osc.start(startTime);
-        osc.stop(startTime + duration + 0.05);
-      };
-
-      // Tres beeps ascendentes: do · mi · sol
-      beep(ctx.currentTime,       523, 0.15, 0.4); // C5
-      beep(ctx.currentTime + 0.2, 659, 0.15, 0.4); // E5
-      beep(ctx.currentTime + 0.4, 784, 0.30, 0.5); // G5
+      const audio = new Audio('assets/sounds/timer_done.wav');
+      audio.play();
     } catch (_) {
-      // Web Audio no disponible — falla silenciosamente
+      // Audio no disponible — falla silenciosamente
     }
   }
 }

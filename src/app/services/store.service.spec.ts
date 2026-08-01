@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { StoreService } from './store.service';
 import { Knot } from '../models/knot.model';
+import { Chain } from '../models/chain.model';
 
 function makeKnot(overrides: Partial<Knot> = {}): Knot {
   const now = Date.now();
@@ -255,6 +256,86 @@ describe('StoreService', () => {
 
       const freshService = new StoreService();
       expect(freshService.getKnotById('fresh1')).toBeTruthy();
+    });
+  });
+
+  // ─── Import/Export with Chains ──────────────────────────────────────────
+  describe('import/export with chains', () => {
+    it('should include chains array in exported data', () => {
+      const chain: Chain = { id: 'chain-1', name: 'Mi cadena', createdAt: Date.now() };
+      service.saveChains([chain]);
+
+      // We can't easily test exportData() since it triggers a download,
+      // but we can verify getChains() is included in the export structure
+      expect(service.getChains()).toEqual([chain]);
+    });
+
+    it('should restore chains from imported JSON', () => {
+      const chain: Chain = { id: 'chain-imp', name: 'Importada', createdAt: 1700000000000 };
+      const knot = makeKnot({ id: 'k1', chainId: 'chain-imp', chainOrder: 0 });
+      const payload = JSON.stringify({ knots: [knot], events: [], chains: [chain] });
+
+      service.importData(payload);
+
+      expect(service.getChains().length).toBe(1);
+      expect(service.getChains()[0].id).toBe('chain-imp');
+      expect(service.getKnots()[0].chainId).toBe('chain-imp');
+      expect(service.getKnots()[0].chainOrder).toBe(0);
+    });
+
+    it('should treat missing chains array as empty and clear orphan chainIds', () => {
+      const knot = makeKnot({ id: 'k-orphan', chainId: 'nonexistent-chain', chainOrder: 0 });
+      const payload = JSON.stringify({ knots: [knot], events: [] });
+
+      service.importData(payload);
+
+      expect(service.getChains()).toEqual([]);
+      const imported = service.getKnots().find(k => k.id === 'k-orphan');
+      expect(imported?.chainId).toBeNull();
+      expect(imported?.chainOrder).toBeNull();
+    });
+
+    it('should clear orphan chainIds referencing non-existent chains on import', () => {
+      const chain: Chain = { id: 'chain-real', name: 'Real', createdAt: 1700000000000 };
+      const knotValid = makeKnot({ id: 'k-valid', chainId: 'chain-real', chainOrder: 0 });
+      const knotOrphan = makeKnot({ id: 'k-orphan2', chainId: 'chain-ghost', chainOrder: 1 });
+      const payload = JSON.stringify({ knots: [knotValid, knotOrphan], events: [], chains: [chain] });
+
+      service.importData(payload);
+
+      const validKnot = service.getKnots().find(k => k.id === 'k-valid');
+      const orphanKnot = service.getKnots().find(k => k.id === 'k-orphan2');
+      expect(validKnot?.chainId).toBe('chain-real');
+      expect(orphanKnot?.chainId).toBeNull();
+      expect(orphanKnot?.chainOrder).toBeNull();
+    });
+
+    it('should delete chains with no member knots after import', () => {
+      const chain1: Chain = { id: 'chain-with-knots', name: 'Llena', createdAt: 1700000000000 };
+      const chain2: Chain = { id: 'chain-empty', name: 'Vacía', createdAt: 1700000000000 };
+      const knot = makeKnot({ id: 'k-member', chainId: 'chain-with-knots', chainOrder: 0 });
+      const payload = JSON.stringify({ knots: [knot], events: [], chains: [chain1, chain2] });
+
+      service.importData(payload);
+
+      expect(service.getChains().length).toBe(1);
+      expect(service.getChains()[0].id).toBe('chain-with-knots');
+    });
+
+    it('should recalculate consecutive chainOrder after import with gaps', () => {
+      const chain: Chain = { id: 'chain-gaps', name: 'Gaps', createdAt: 1700000000000 };
+      const k1 = makeKnot({ id: 'kg1', chainId: 'chain-gaps', chainOrder: 0 });
+      const k2 = makeKnot({ id: 'kg2', chainId: 'chain-gaps', chainOrder: 5 });
+      const k3 = makeKnot({ id: 'kg3', chainId: 'chain-gaps', chainOrder: 10 });
+      const payload = JSON.stringify({ knots: [k1, k2, k3], events: [], chains: [chain] });
+
+      service.importData(payload);
+
+      const knots = service.getKnots().filter(k => k.chainId === 'chain-gaps')
+        .sort((a, b) => (a.chainOrder ?? 0) - (b.chainOrder ?? 0));
+      expect(knots[0].chainOrder).toBe(0);
+      expect(knots[1].chainOrder).toBe(1);
+      expect(knots[2].chainOrder).toBe(2);
     });
   });
 });

@@ -16,7 +16,12 @@ export type EventType =
   | 'GOAL_SWITCHED'
   | 'NUDGE_SHOWN'
   | 'RESET_ALL_DATA'
-  | 'CAPTURE_BLOCKED_SYSTEM_FULL';
+  | 'CAPTURE_BLOCKED_SYSTEM_FULL'
+  | 'CHAIN_CREATED'
+  | 'CHAIN_DELETED'
+  | 'KNOT_ADDED_TO_CHAIN'
+  | 'KNOT_REMOVED_FROM_CHAIN'
+  | 'CHAIN_REORDERED';
 
 export interface AppEvent {
   id: string;
