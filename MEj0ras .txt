@@ -1,0 +1,54 @@
+Basándome en lo que veo de la app (sistema de productividad personal con nudos, estados, timer de enfoque, cadenas, metas diarias, rachas), acá van mis sugerencias ordenadas por impacto:
+
+Alto impacto — cambiarían cómo usás la app
+1. Widget de Android
+Un widget en la home screen mostrando:
+
+Nudo actual (DOING) con botón de timer directo
+Progreso del día (2/3 hechos)
+El próximo desbloqueable para arrancar rápido
+Por qué: Elimina la fricción de abrir la app. El usuario ve su estado y actúa en 1 tap.
+
+2. Modo "sesión rápida" desde notificación
+Cuando la notificación de la mañana aparece, que tenga un botón de acción "Arrancar 5 min" que directamente inicia el timer del primer desbloqueable sin abrir la app completa.
+
+Por qué: Reduce la barrera de "abrir la app → elegir → arrancar" a un solo tap.
+
+3. Recurrencia / hábitos
+Nudos que se reciclan automáticamente. Marcás uno como "recurrente" (diario/semanal) y cuando lo completás, al día siguiente reaparece como UNLOCKABLE.
+
+Por qué: Muchas tareas de productividad son repetitivas. Hoy hay que recapturar cada vez.
+
+Medio-alto impacto — mejoran la experiencia diaria
+4. Historial de sesiones de timer
+Guardar cada sesión de timer (inicio, duración, nudo, completó o canceló). Mostrar en Insights: "Esta semana: 12 sesiones, 47 min totales de enfoque".
+
+Por qué: El dato motiva. Ver que acumulaste horas de foco refuerza el hábito.
+
+5. Notas/progreso en nudos
+Un campo expandible en cada nudo donde ir anotando avances ("Hoy hice X", "Falta Y"). Tipo mini-log.
+
+Por qué: Nudos complejos viven días/semanas. Sin contexto, al volver no te acordás dónde estabas.
+
+6. Transiciones rápidas con swipe
+En las tarjetas de nudos: swipe derecha → marcar hecho, swipe izquierda → mover a SOMEDAY. Sin abrir modal.
+
+Por qué: Reduce toques. La app es de velocidad — cuantos menos pasos, mejor.
+
+Mejoras técnicas de alto impacto en UX
+7. Backup automático periódico
+Hacer export automático a Gist (ya tenés gist-sync.service) cada N horas o al cerrar la app, sin que el usuario tenga que acordarse.
+
+Por qué: Perder datos en una app de LocalStorage es devastador.
+
+8. Onboarding con nudos de ejemplo
+Para usuarios nuevos: pre-cargar 2-3 nudos ejemplo que enseñen el flujo (uno UNLOCKABLE, uno BLOCKED, etc.), con instrucciones como título.
+
+Por qué: La curva de aprendizaje del sistema es empinada sin guía.
+
+Si tuviera que elegir uno solo para implementar ahora: el widget de Android. Es lo que más cambia el día a día porque te mantiene conectado sin esfuerzo consciente.
+
+¿Alguno te interesa para que lo diseñemos?
+
+
+guarda y subi tds ests cambis cn agun cmmit que haga referencia a s cambis de encadenad y aarma
