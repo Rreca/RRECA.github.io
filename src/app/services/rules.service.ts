@@ -163,11 +163,48 @@ export class RulesService {
     this.store.updateKnot({ id: knotId, status: 'DONE', doneAt: Date.now() });
     this.store.logEvent('KNOT_DONE', { knotId, feltLighter });
 
+    // If recurring, schedule next recurrence
+    if (knot.recurrence) {
+      const nextAt = this.computeNextRecurrence(knot.recurrence);
+      this.store.updateKnot({ id: knotId, nextRecurrenceAt: nextAt });
+    }
+
     // Celebración si se cumplió la meta del día
     const doneToday = this.goal.countDoneToday();
     const dailyGoal = this.goal.getDailyGoal();
     if (doneToday >= dailyGoal) {
       this.notif.scheduleCelebration();
+    }
+  }
+
+  /** Compute next recurrence timestamp (next day at 00:00 for daily, +7 days for weekly) */
+  private computeNextRecurrence(type: 'daily' | 'weekly'): number {
+    const now = new Date();
+    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (type === 'daily') {
+      next.setDate(next.getDate() + 1);
+    } else {
+      next.setDate(next.getDate() + 7);
+    }
+    return next.getTime();
+  }
+
+  /** Recycle recurring knots that are due. Call on app open. */
+  recycleRecurringKnots(): void {
+    const knots = this.store.getKnots();
+    const now = Date.now();
+    for (const knot of knots) {
+      if (knot.recurrence && knot.status === 'DONE' && knot.nextRecurrenceAt && knot.nextRecurrenceAt <= now) {
+        this.store.updateKnot({
+          id: knot.id,
+          status: 'UNLOCKABLE',
+          doneAt: null,
+          nextRecurrenceAt: null,
+          updatedAt: now,
+          lastTouchedAt: now,
+        });
+        this.store.logEvent('KNOT_RECYCLED', { knotId: knot.id, recurrence: knot.recurrence });
+      }
     }
   }
 

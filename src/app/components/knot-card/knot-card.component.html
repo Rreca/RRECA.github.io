@@ -2,6 +2,10 @@
   [ngClass]="['card-' + knot.status.toLowerCase(), justDone ? 'card-just-done' : '']"
   (click)="openDetail($event)">
 
+  <!-- Swipe indicator -->
+  <div *ngIf="swipeIndicator === 'done'" class="swipe-indicator swipe-done">✅ Hecho</div>
+  <div *ngIf="swipeIndicator === 'someday'" class="swipe-indicator swipe-someday">💤 Algún día</div>
+
   <!-- Overlay de checkmark al marcar HECHO -->
   <div *ngIf="justDone" class="done-overlay">
     <div class="done-check">✅</div>
@@ -94,5 +98,26 @@
       </ng-container>
 
     </div>
+
+    <!-- Mini-log de notas (expandible) -->
+    <div class="notes-section" *ngIf="knot.status !== 'ARCHIVED'" (click)="$event.stopPropagation()">
+      <button class="notes-toggle" (click)="toggleNotes()">
+        📝 {{ (knot.notes?.length || 0) }} nota{{ (knot.notes?.length || 0) !== 1 ? 's' : '' }}
+        {{ notesExpanded ? '▾' : '▸' }}
+      </button>
+      <div *ngIf="notesExpanded" class="notes-list">
+        <div *ngFor="let note of knot.notes; let i = index" class="note-item">
+          <span class="note-text">{{ note }}</span>
+          <button class="note-delete" (click)="deleteNote(i)">✕</button>
+        </div>
+        <div class="note-input-row">
+          <input class="note-input" placeholder="Anotar avance..."
+            [(ngModel)]="newNote"
+            (keydown.enter)="addNote()" />
+          <button class="note-add-btn" (click)="addNote()" [disabled]="!newNote.trim()">+</button>
+        </div>
+      </div>
+    </div>
+
   </ion-card-content>
 </ion-card>

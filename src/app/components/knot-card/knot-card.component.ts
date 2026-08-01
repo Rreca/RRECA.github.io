@@ -1,9 +1,10 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ElementRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   IonCard, IonCardContent, IonButton, IonIcon,
   IonRange, IonBadge, ModalController, AlertController,
+  GestureController, Gesture,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
@@ -42,8 +43,12 @@ export class KnotCardComponent implements OnInit {
   impact = 3;
   score = 0;
   justDone = false; // activa animación de checkmark
+  swipeIndicator: 'done' | 'someday' | null = null;
+  notesExpanded = false;
+  newNote = '';
 
   private debounce: ReturnType<typeof setTimeout> | null = null;
+  private gesture!: Gesture;
 
   constructor(
     private rules: RulesService,
@@ -53,6 +58,9 @@ export class KnotCardComponent implements OnInit {
     private timer: TimerService,
     private modal: ModalController,
     private alert: AlertController,
+    private el: ElementRef,
+    private gestureCtrl: GestureController,
+    private zone: NgZone,
   ) {
     addIcons({ play, pause, checkmark, pencil, trash, chevronUp, chevronDown, hammer });
   }
@@ -61,6 +69,56 @@ export class KnotCardComponent implements OnInit {
     this.friction = this.rules.getFriction(this.knot);
     this.impact = this.rules.getImpact(this.knot);
     this.score = this.rules.priorityScore(this.knot);
+    this.setupSwipeGesture();
+  }
+
+  private setupSwipeGesture(): void {
+    // Only enable swipe for DOING and UNLOCKABLE
+    if (this.knot.status !== 'DOING' && this.knot.status !== 'UNLOCKABLE') return;
+
+    const card = this.el.nativeElement.querySelector('ion-card');
+    if (!card) return;
+
+    const THRESHOLD = 80;
+
+    this.gesture = this.gestureCtrl.create({
+      el: card,
+      gestureName: 'knot-swipe',
+      direction: 'x',
+      threshold: 15,
+      onMove: (detail) => {
+        const x = detail.deltaX;
+        card.style.transform = `translateX(${x}px)`;
+        card.style.opacity = String(1 - Math.abs(x) / 300);
+
+        this.zone.run(() => {
+          if (x > THRESHOLD) this.swipeIndicator = 'done';
+          else if (x < -THRESHOLD) this.swipeIndicator = 'someday';
+          else this.swipeIndicator = null;
+        });
+      },
+      onEnd: (detail) => {
+        const x = detail.deltaX;
+        card.style.transition = 'transform 0.2s, opacity 0.2s';
+        card.style.transform = 'translateX(0)';
+        card.style.opacity = '1';
+        setTimeout(() => { card.style.transition = ''; }, 200);
+
+        this.zone.run(() => {
+          if (x > THRESHOLD) {
+            // Swipe right → mark done
+            this.timer.stop('SWIPE_DONE');
+            this.completeDone(true);
+          } else if (x < -THRESHOLD) {
+            // Swipe left → move to someday
+            this.rules.transitionToSomeday(this.knot.id);
+            this.refresh.emit();
+          }
+          this.swipeIndicator = null;
+        });
+      },
+    });
+    this.gesture.enable(true);
   }
 
   get statusLabel(): string {
@@ -267,6 +325,28 @@ export class KnotCardComponent implements OnInit {
     event.stopPropagation();
     this.rules.restoreArchivedToSomeday(this.knot.id);
     this.refresh.emit();
+  }
+
+  // ─── Notas / mini-log ──────────────────────────────────────────────────
+
+  toggleNotes(): void {
+    this.notesExpanded = !this.notesExpanded;
+  }
+
+  addNote(): void {
+    const text = this.newNote.trim();
+    if (!text) return;
+    const notes = [...(this.knot.notes || []), text];
+    this.store.updateKnot({ id: this.knot.id, notes });
+    this.knot.notes = notes;
+    this.newNote = '';
+  }
+
+  deleteNote(index: number): void {
+    const notes = [...(this.knot.notes || [])];
+    notes.splice(index, 1);
+    this.store.updateKnot({ id: this.knot.id, notes });
+    this.knot.notes = notes;
   }
 
   private async showAlert(header: string, message: string): Promise<void> {

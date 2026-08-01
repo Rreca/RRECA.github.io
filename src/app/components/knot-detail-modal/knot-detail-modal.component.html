@@ -78,6 +78,22 @@
       </ion-button>
     </div>
 
+    <!-- Recurrencia -->
+    <div class="panel" style="background:white; border:1px solid #dfe6ee; border-radius:12px; padding:12px; margin-top:12px;">
+      <h3 style="margin-top:0;">Recurrencia</h3>
+      <div class="hint" style="margin-bottom:8px;">
+        Si es recurrente, al completarlo reaparece automáticamente como desbloqueable.
+      </div>
+      <select [(ngModel)]="recurrencePick" (change)="saveRecurrence()" class="ion-select-native">
+        <option value="">Sin recurrencia (una vez)</option>
+        <option value="daily">🔄 Diario</option>
+        <option value="weekly">📅 Semanal</option>
+      </select>
+      <div *ngIf="knot.recurrence" class="hint" style="margin-top:6px; color:var(--color-primary);">
+        ♻️ {{ knot.recurrence === 'daily' ? 'Se recicla cada día' : 'Se recicla cada semana' }}
+      </div>
+    </div>
+
     <!-- Acciones -->
     <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
       <ion-button *ngIf="knot.status === 'ARCHIVED'" fill="solid" color="primary" (click)="restoreArchived()">

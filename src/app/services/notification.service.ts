@@ -78,8 +78,23 @@ export class NotificationService {
         sound:       'default',
         vibration:   true,
       });
+      await this.registerActionTypes();
       this.channelCreated = true;
     } catch { /* silencioso en iOS */ }
+  }
+
+  private async registerActionTypes(): Promise<void> {
+    try {
+      await LocalNotifications.registerActionTypes({
+        types: [{
+          id: 'MORNING_ACTIONS',
+          actions: [{
+            id: 'quick_start_timer',
+            title: '⏱ Arrancar 5 min',
+          }],
+        }],
+      });
+    } catch { /* silencioso */ }
   }
 
   // ─── Permisos ────────────────────────────────────────────────────────────
@@ -142,6 +157,16 @@ export class NotificationService {
   }
 
   // ─── Mensajes dinámicos ──────────────────────────────────────────────────
+
+  /** Returns the first DOING or UNLOCKABLE knot for quick-start timer */
+  getQuickStartKnot(): { id: string; title: string; estMinutes: number | null } | null {
+    const knots = this.store.getKnots();
+    const doing = knots.find(k => k.status === 'DOING');
+    if (doing) return { id: doing.id, title: doing.title, estMinutes: (doing as any).estMinutes ?? null };
+    const unlockable = knots.find(k => k.status === 'UNLOCKABLE');
+    if (unlockable) return { id: unlockable.id, title: unlockable.title, estMinutes: (unlockable as any).estMinutes ?? null };
+    return null;
+  }
 
   private buildMorningMessage(): { title: string; body: string } | null {
     const knots      = this.store.getKnots();
@@ -232,7 +257,21 @@ export class NotificationService {
     if (next <= now) next.setDate(next.getDate() + 1);
 
     try {
-      await this.doSchedule(NOTIF_IDS.MORNING, msg.title, msg.body, next);
+      await this.ensureChannel();
+      await LocalNotifications.schedule({
+        notifications: [{
+          id: NOTIF_IDS.MORNING,
+          title: msg.title,
+          body: msg.body,
+          channelId: CHANNEL_ID,
+          schedule: { at: next, repeats: false },
+          smallIcon: 'ic_stat_nudos',
+          largeIcon: 'ic_launcher',
+          iconColor: '#2563EB',
+          extra: { action: 'open' },
+          actionTypeId: 'MORNING_ACTIONS',
+        }],
+      });
       this.incrementDailyCount();
     } catch (e) { console.error('scheduleMorning error:', e); }
   }

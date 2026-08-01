@@ -3,6 +3,7 @@ export type BlockReason = 'NO_START' | 'LAZINESS' | 'FEAR' | 'EXTERNAL' | 'NOT_T
 export type KnotContext = 'ANY' | 'HOME' | 'STREET' | 'WORK';
 export type ContextFilter = 'ALL' | 'HOME' | 'STREET' | 'WORK' | 'ANY';
 export type ArchiveReason = 'SPLIT' | 'DONE_MERGE' | 'MANUAL' | 'CLEANUP' | 'OTHER';
+export type RecurrenceType = 'daily' | 'weekly' | null;
 
 export interface Knot {
   id: string;
@@ -25,6 +26,9 @@ export interface Knot {
   parentId?: string | null;  // id del nudo del que fue dividido (SPLIT)
   chainId?: string | null;       // references Chain.id
   chainOrder?: number | null;    // 0-based position within chain
+  recurrence?: RecurrenceType;   // null = one-time, 'daily' or 'weekly'
+  nextRecurrenceAt?: number | null;  // timestamp when it should reappear as UNLOCKABLE
+  notes?: string[];  // mini-log de avances
 }
 
 export type KnotPatch = Partial<Knot> & { id: string };

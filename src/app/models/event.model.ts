@@ -21,7 +21,8 @@ export type EventType =
   | 'CHAIN_DELETED'
   | 'KNOT_ADDED_TO_CHAIN'
   | 'KNOT_REMOVED_FROM_CHAIN'
-  | 'CHAIN_REORDERED';
+  | 'CHAIN_REORDERED'
+  | 'KNOT_RECYCLED';
 
 export interface AppEvent {
   id: string;

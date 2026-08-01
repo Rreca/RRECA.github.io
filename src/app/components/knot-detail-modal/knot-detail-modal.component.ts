@@ -30,6 +30,7 @@ export class KnotDetailModalComponent implements OnInit {
   knot!: Knot;
   contextPick = 'AUTO';
   targetChainId = '';
+  recurrencePick = '';
 
   constructor(
     private modal: ModalController,
@@ -50,6 +51,7 @@ export class KnotDetailModalComponent implements OnInit {
     this.knot = k;
     const src = this.ctx.getContextSource(k);
     this.contextPick = src === 'MANUAL' ? this.ctx.getKnotContext(k) : 'AUTO';
+    this.recurrencePick = k.recurrence ?? '';
   }
 
   get statusLabel(): string {
@@ -150,5 +152,15 @@ export class KnotDetailModalComponent implements OnInit {
 
   dismiss(): void {
     this.modal.dismiss();
+  }
+
+  saveRecurrence(): void {
+    const value = this.recurrencePick || null;
+    this.store.updateKnot({
+      id: this.knot.id,
+      recurrence: value as any,
+      nextRecurrenceAt: null,
+    });
+    this.load();
   }
 }

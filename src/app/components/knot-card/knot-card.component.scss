@@ -77,3 +77,92 @@
   background-color: #e8d4f0;
   color: #6b21a8;
 }
+
+// ─── Swipe indicators ──────────────────────────────────────────────────────
+.swipe-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+.swipe-done {
+  right: 12px;
+  background: rgba(22, 163, 74, 0.15);
+  color: #16a34a;
+}
+.swipe-someday {
+  left: 12px;
+  background: rgba(107, 114, 128, 0.15);
+  color: #6b7280;
+}
+
+// ─── Notes / mini-log ──────────────────────────────────────────────────────
+.notes-section {
+  margin-top: 10px;
+  border-top: 1px solid var(--color-gray-100, #f3f4f6);
+  padding-top: 8px;
+}
+.notes-toggle {
+  background: none;
+  border: none;
+  color: var(--color-gray-500, #6b7280);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 2px 0;
+  font-weight: 600;
+}
+.notes-list {
+  margin-top: 6px;
+}
+.note-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  font-size: 12px;
+  color: var(--color-gray-600, #4b5563);
+}
+.note-text {
+  flex: 1;
+}
+.note-delete {
+  background: none;
+  border: none;
+  color: var(--color-gray-400, #9ca3af);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  &:hover { color: var(--color-danger, #ef4444); }
+}
+.note-input-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.note-input {
+  flex: 1;
+  border: 1px solid var(--color-gray-200, #e5e7eb);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  outline: none;
+  &:focus { border-color: var(--color-primary, #2563eb); }
+}
+.note-add-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--color-primary, #2563eb);
+  background: white;
+  color: var(--color-primary, #2563eb);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  &:disabled { opacity: 0.4; cursor: default; }
+}
