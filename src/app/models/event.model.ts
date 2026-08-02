@@ -23,7 +23,8 @@ export type EventType =
   | 'KNOT_REMOVED_FROM_CHAIN'
   | 'CHAIN_REORDERED'
   | 'KNOT_RECYCLED'
-  | 'RECURRENCE_PAUSED';
+  | 'RECURRENCE_PAUSED'
+  | 'WEEKLY_RETRO_SENT';
 
 export interface AppEvent {
   id: string;

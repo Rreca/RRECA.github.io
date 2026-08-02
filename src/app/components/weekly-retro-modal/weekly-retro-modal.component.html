@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>📊 Resumen semanal</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">✕</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="padding: 24px; max-width: 500px; margin: 0 auto;">
+
+    <!-- Completados esta semana -->
+    <div class="retro-card">
+      <div class="retro-label">Nudos completados esta semana</div>
+      <div class="retro-value">{{ doneThisWeek }}</div>
+    </div>
+
+    <!-- El más difícil completado -->
+    <div class="retro-card" *ngIf="hardestDone">
+      <div class="retro-label">El más difícil que cerraste</div>
+      <div class="retro-highlight">{{ hardestDone.title }}</div>
+      <div class="retro-sub">Fricción: {{ hardestDone.weight }}/5</div>
+    </div>
+    <div class="retro-card" *ngIf="!hardestDone">
+      <div class="retro-label">El más difícil que cerraste</div>
+      <div class="retro-sub">Ninguno esta semana</div>
+    </div>
+
+    <!-- El más evitado -->
+    <div class="retro-card" *ngIf="mostAvoided">
+      <div class="retro-label">El más evitado</div>
+      <div class="retro-highlight">{{ mostAvoided.title }}</div>
+      <div class="retro-sub">Desbloqueable desde {{ mostAvoidedAge }}</div>
+    </div>
+    <div class="retro-card" *ngIf="!mostAvoided">
+      <div class="retro-label">El más evitado</div>
+      <div class="retro-sub">No hay nudos pendientes</div>
+    </div>
+
+    <!-- Intención semanal -->
+    <div class="retro-card">
+      <div class="retro-label">¿Qué querés desatar esta semana?</div>
+      <input type="text"
+        class="retro-input"
+        [(ngModel)]="weeklyIntention"
+        (change)="saveIntention()"
+        placeholder="Escribí tu intención…" />
+    </div>
+
+  </div>
+</ion-content>

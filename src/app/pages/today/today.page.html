@@ -5,6 +5,12 @@
 
   <div style="padding: 16px; padding-top: calc(env(safe-area-inset-top, 0px) + 60px); max-width: 680px; margin: 0 auto;">
 
+    <!-- ── Banner primer toque del día ── -->
+    <div *ngIf="firstTouchCelebration" class="first-touch-banner"
+         [class.fade-out]="!firstTouchCelebration">
+      <span class="first-touch-text">{{ firstTouchMessage }}</span>
+    </div>
+
     <!-- ── Indicador de meta ── -->
     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
       <div>

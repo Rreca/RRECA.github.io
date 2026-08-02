@@ -20,6 +20,15 @@ import { ChainViewComponent } from '../../components/chain-view/chain-view.compo
 
 type BacklogSort = 'friction' | 'impact' | 'recent';
 
+const FIRST_TOUCH_KEY = 'nudos_first_touch_v1';
+
+const FIRST_TOUCH_MESSAGES = [
+  'Hoy ya no fue un día perdido',
+  'Arrancaste. Eso es todo lo que importa.',
+  'El primer paso ya está. El resto es bonus.',
+  'Día activado ✓',
+];
+
 // Mapa de status → id del elemento en el HTML
 const SECTION_IDS: Record<string, string> = {
   DOING:      'section-doing',
@@ -66,6 +75,10 @@ export class TodayPage implements OnInit, OnDestroy {
   doneOpen = true;
   backlogOpen = true;
 
+  // First touch of the day celebration
+  firstTouchCelebration = false;
+  firstTouchMessage = '';
+
   // Backlog separado por tipo
   get somedayKnots(): Knot[] { return this.backlog.filter(k => k.status === 'SOMEDAY'); }
   get blockedKnots(): Knot[] { return this.backlog.filter(k => k.status === 'BLOCKED'); }
@@ -73,6 +86,7 @@ export class TodayPage implements OnInit, OnDestroy {
   private sub!: Subscription;
   private filterSub!: Subscription;
   private chainSub!: Subscription;
+  private firstTouchSub!: Subscription;
 
   constructor(
     private store: StoreService,
@@ -94,6 +108,12 @@ export class TodayPage implements OnInit, OnDestroy {
         .filter(c => this.chainService.getChainSize(c.id) > 0)
         .sort((a, b) => b.createdAt - a.createdAt);
     });
+
+    // Listen for first done of the day
+    this.firstTouchSub = this.rules.firstTouchOfDay$.subscribe(() => {
+      this.showFirstTouchCelebration();
+    });
+
     this.render();
 
     // Scroll a sección si viene de Análisis
@@ -114,6 +134,7 @@ export class TodayPage implements OnInit, OnDestroy {
     this.sub?.unsubscribe();
     this.filterSub?.unsubscribe();
     this.chainSub?.unsubscribe();
+    this.firstTouchSub?.unsubscribe();
   }
 
   scrollToSection(status: string): void {
@@ -233,5 +254,24 @@ export class TodayPage implements OnInit, OnDestroy {
   handleRefresh(event: CustomEvent): void {
     this.render();
     (event.target as HTMLIonRefresherElement).complete();
+  }
+
+  private showFirstTouchCelebration(): void {
+    // Check if already triggered today
+    const today = new Date().toISOString().slice(0, 10);
+    const stored = localStorage.getItem(FIRST_TOUCH_KEY);
+    if (stored === today) return;
+
+    // Mark today as activated
+    localStorage.setItem(FIRST_TOUCH_KEY, today);
+
+    // Pick random message
+    this.firstTouchMessage = FIRST_TOUCH_MESSAGES[Math.floor(Math.random() * FIRST_TOUCH_MESSAGES.length)];
+    this.firstTouchCelebration = true;
+
+    // Auto-dismiss after 4 seconds
+    setTimeout(() => {
+      this.firstTouchCelebration = false;
+    }, 4000);
   }
 }

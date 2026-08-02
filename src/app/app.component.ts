@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular/standalone';
 import { NotificationService } from './services/notification.service';
 import { WidgetBridgeService } from './services/widget-bridge.service';
 import { TimerService } from './services/timer.service';
@@ -24,6 +25,7 @@ export class AppComponent implements OnInit {
     private _widgetBridge: WidgetBridgeService,
     private timer: TimerService,
     private rules: RulesService,
+    private modalCtrl: ModalController,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -36,6 +38,7 @@ export class AppComponent implements OnInit {
     // Escuchar tap en notificaciones → abrir la app en la pantalla correcta
     LocalNotifications.addListener('localNotificationActionPerformed', (action) => {
       const actionId = action.actionId;
+      const notifId = action.notification.id;
 
       if (actionId === 'quick_start_timer') {
         // Start timer with first available knot without opening app UI
@@ -44,6 +47,12 @@ export class AppComponent implements OnInit {
           const minutes = knot.estMinutes && knot.estMinutes > 0 ? knot.estMinutes : 5;
           this.timer.start(knot.id, minutes);
         }
+        return;
+      }
+
+      // Weekly retro notification → open retro modal
+      if (notifId === 1005) {
+        this.openWeeklyRetroModal();
         return;
       }
 
@@ -58,5 +67,11 @@ export class AppComponent implements OnInit {
         await this.notif.scheduleAll();
       }
     }, 1500);
+  }
+
+  private async openWeeklyRetroModal(): Promise<void> {
+    const { WeeklyRetroModalComponent } = await import('./components/weekly-retro-modal/weekly-retro-modal.component');
+    const modal = await this.modalCtrl.create({ component: WeeklyRetroModalComponent });
+    await modal.present();
   }
 }

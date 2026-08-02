@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 import { Knot, KnotStatus } from '../models/knot.model';
 import { StoreService } from './store.service';
 import { NotificationService } from './notification.service';
@@ -12,6 +13,10 @@ export interface CaptureResult {
 
 @Injectable({ providedIn: 'root' })
 export class RulesService {
+
+  /** Emits when the first done of the day happens */
+  readonly firstTouchOfDay$ = new Subject<void>();
+
   constructor(
     private store: StoreService,
     private notif: NotificationService,
@@ -167,6 +172,10 @@ export class RulesService {
   transitionToDone(knotId: string, feltLighter: boolean): void {
     const knot = this.store.getKnotById(knotId);
     if (!knot) throw new Error('Nudo no encontrado.');
+
+    // Check if this will be the first done of the day (before marking done)
+    const countBefore = this.goal.countDoneToday();
+
     this.store.updateKnot({ id: knotId, status: 'DONE', doneAt: Date.now() });
     this.store.logEvent('KNOT_DONE', { knotId, feltLighter });
 
@@ -174,6 +183,11 @@ export class RulesService {
     if (knot.recurrence) {
       const nextAt = this.computeNextRecurrence(knot.recurrence);
       this.store.updateKnot({ id: knotId, nextRecurrenceAt: nextAt });
+    }
+
+    // First done of the day → emit event
+    if (countBefore === 0) {
+      this.firstTouchOfDay$.next();
     }
 
     // Celebración si se cumplió la meta del día

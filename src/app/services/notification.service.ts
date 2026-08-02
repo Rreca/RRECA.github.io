@@ -20,11 +20,12 @@ const DAILY_COUNT_KEY   = 'nudos_notif_daily_count_v1';  // { date: 'YYYY-MM-DD'
 const CHANNEL_ID        = 'nudos_default';
 
 const NOTIF_IDS = {
-  MORNING:     1001,
-  STREAK:      1002,
-  CELEBRATION: 1003,
-  INACTIVITY:  1004,
-  TEST:        9999,
+  MORNING:      1001,
+  STREAK:       1002,
+  CELEBRATION:  1003,
+  INACTIVITY:   1004,
+  WEEKLY_RETRO: 1005,
+  TEST:         9999,
 };
 
 const DEFAULT_SETTINGS: NotificationSettings = {
@@ -227,6 +228,7 @@ export class NotificationService {
     await this.scheduleMorning();
     await this.scheduleStreakProtection();
     if (s.inactivityEnabled) await this.scheduleInactivityReminder();
+    await this.scheduleWeeklyRetro();
   }
 
   async cancelAll(): Promise<void> {
@@ -334,6 +336,28 @@ export class NotificationService {
       );
       this.incrementDailyCount();
     } catch (e) { console.error('scheduleInactivity error:', e); }
+  }
+
+  // ─── Weekly Retro (domingo 20h) ───────────────────────────────────────────
+
+  async scheduleWeeklyRetro(): Promise<void> {
+    const now  = new Date();
+    const next = new Date();
+    // Calcular próximo domingo
+    const dayOfWeek = now.getDay(); // 0=domingo
+    const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+    next.setDate(now.getDate() + daysUntilSunday);
+    next.setHours(20, 0, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 7);
+
+    try {
+      await this.doSchedule(
+        NOTIF_IDS.WEEKLY_RETRO,
+        '📊 Tu semana en Nudos',
+        'Mirá cuánto avanzaste. Tocá para ver.',
+        next
+      );
+    } catch (e) { console.error('scheduleWeeklyRetro error:', e); }
   }
 
   // ─── Test ────────────────────────────────────────────────────────────────
