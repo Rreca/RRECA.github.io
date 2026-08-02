@@ -42,20 +42,21 @@ export class WeeklyRetroModalComponent implements OnInit {
 
   private compute(): void {
     const knots = this.store.getKnots();
+    const events = this.store.getEvents();
     const weekStart = startOfWeekTsMonday();
 
-    // Done this week
-    const doneThisWeekKnots = knots.filter(k => {
-      if (k.status !== 'DONE') return false;
-      const ts = k.doneAt ?? k.updatedAt ?? 0;
-      return ts >= weekStart;
-    });
-    this.doneThisWeek = doneThisWeekKnots.length;
+    // Count KNOT_DONE events this week (includes recycled recurring knots)
+    const doneEventsThisWeek = events.filter(e =>
+      e.type === 'KNOT_DONE' && e.createdAt >= weekStart
+    );
+    this.doneThisWeek = doneEventsThisWeek.length;
 
-    // Hardest done (highest friction)
-    if (doneThisWeekKnots.length) {
-      this.hardestDone = doneThisWeekKnots.reduce((max, k) =>
-        k.weight > max.weight ? k : max, doneThisWeekKnots[0]);
+    // Hardest done: find the knot with highest friction among those completed this week
+    const doneKnotIds = new Set(doneEventsThisWeek.map(e => e.knotId).filter(Boolean));
+    const doneKnotsThisWeek = knots.filter(k => doneKnotIds.has(k.id));
+    if (doneKnotsThisWeek.length) {
+      this.hardestDone = doneKnotsThisWeek.reduce((max, k) =>
+        k.weight > max.weight ? k : max, doneKnotsThisWeek[0]);
     }
 
     // Most avoided: oldest UNLOCKABLE by lastTouchedAt that hasn't been completed
