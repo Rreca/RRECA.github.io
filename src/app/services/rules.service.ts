@@ -145,7 +145,14 @@ export class RulesService {
   }
 
   transitionToSomeday(knotId: string): void {
-    this.store.updateKnot({ id: knotId, status: 'SOMEDAY' });
+    const knot = this.store.getKnotById(knotId);
+    if (knot?.recurrence) {
+      // Pause recurrence when moving to SOMEDAY
+      this.store.updateKnot({ id: knotId, status: 'SOMEDAY', recurrence: null, nextRecurrenceAt: null });
+      this.store.logEvent('RECURRENCE_PAUSED', { knotId });
+    } else {
+      this.store.updateKnot({ id: knotId, status: 'SOMEDAY' });
+    }
   }
 
   transitionToPauseDoing(knotId: string): void {
