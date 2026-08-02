@@ -4,125 +4,147 @@
     android:layout_height="match_parent"
     android:minWidth="@dimen/widget_min_width"
     android:minHeight="@dimen/widget_min_height"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="@dimen/widget_padding"
     android:background="@drawable/widget_background">
 
-    <!-- Left Section: Current Knot (weight 2) -->
+    <!-- Motivational phrase — full width at top -->
+    <TextView
+        android:id="@+id/txt_mantra"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sos alguien que hace lo importante, tenga ganas o no"
+        android:textColor="@color/widget_text_primary"
+        android:textSize="11sp"
+        android:textStyle="italic"
+        android:gravity="center"
+        android:paddingBottom="6dp"
+        android:maxLines="2" />
+
+    <!-- Main content: horizontal split -->
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="2"
-        android:orientation="vertical"
-        android:gravity="center_vertical"
-        android:paddingEnd="@dimen/widget_inner_padding">
-
-        <!-- Date display: e.g. "Sábado, 1 de agosto" -->
-        <TextView
-            android:id="@+id/txt_date"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/widget_text_secondary"
-            android:textSize="@dimen/widget_text_body"
-            android:layout_marginBottom="4dp"
-            android:maxLines="1"
-            android:singleLine="true" />
-
-        <!-- Current knot title -->
-        <TextView
-            android:id="@+id/txt_current_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sin nudo activo"
-            android:textColor="@color/widget_text_primary"
-            android:textSize="@dimen/widget_text_title"
-            android:textStyle="bold"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:ellipsize="end" />
-
-        <!-- Next step text (hidden by default) -->
-        <TextView
-            android:id="@+id/txt_next_step"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_item_spacing"
-            android:textColor="@color/widget_text_secondary"
-            android:textSize="@dimen/widget_text_body"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:visibility="gone" />
-
-        <!-- Timer start button (hidden by default) -->
-        <ImageButton
-            android:id="@+id/btn_start_timer"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginTop="@dimen/widget_item_spacing"
-            android:src="@android:drawable/ic_media_play"
-            android:background="@color/widget_button_background"
-            android:contentDescription="Iniciar timer"
-            android:scaleType="centerInside"
-            android:visibility="gone" />
-
-    </LinearLayout>
-
-    <!-- Right Section: Progress + Next Unlockable (weight 1) -->
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center_vertical"
-        android:paddingStart="@dimen/widget_inner_padding">
+        android:orientation="horizontal">
 
-        <!-- Progress fraction text -->
-        <TextView
-            android:id="@+id/txt_progress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="0/1"
-            android:textColor="@color/widget_text_primary"
-            android:textSize="@dimen/widget_text_progress"
-            android:textStyle="bold"
-            android:gravity="center" />
+        <!-- Left Section: Current Knot (weight 2) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/widget_inner_padding">
 
-        <!-- Horizontal progress bar -->
-        <ProgressBar
-            android:id="@+id/progress_bar"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/widget_progress_height"
-            android:layout_marginTop="@dimen/widget_item_spacing"
-            android:max="100"
-            android:progress="0"
-            android:progressDrawable="@android:drawable/progress_horizontal" />
+            <!-- Date display: e.g. "Sábado, 1 de agosto" -->
+            <TextView
+                android:id="@+id/txt_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/widget_text_secondary"
+                android:textSize="@dimen/widget_text_body"
+                android:layout_marginBottom="4dp"
+                android:maxLines="1"
+                android:singleLine="true" />
 
-        <!-- Next unlockable label -->
-        <TextView
-            android:id="@+id/txt_next_unlockable_label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/widget_section_spacing"
-            android:text="Siguiente:"
-            android:textColor="@color/widget_text_label"
-            android:textSize="@dimen/widget_text_label" />
+            <!-- Current knot title -->
+            <TextView
+                android:id="@+id/txt_current_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sin nudo activo"
+                android:textColor="@color/widget_text_primary"
+                android:textSize="@dimen/widget_text_title"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:ellipsize="end" />
 
-        <!-- Next unlockable knot title -->
-        <TextView
-            android:id="@+id/txt_next_unlockable_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Nada desbloqueable"
-            android:textColor="@color/widget_text_secondary"
-            android:textSize="@dimen/widget_text_body"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:clickable="true"
-            android:focusable="true" />
+            <!-- Next step text (hidden by default) -->
+            <TextView
+                android:id="@+id/txt_next_step"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_item_spacing"
+                android:textColor="@color/widget_text_secondary"
+                android:textSize="@dimen/widget_text_body"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+            <!-- Timer start button (hidden by default) -->
+            <ImageButton
+                android:id="@+id/btn_start_timer"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="@dimen/widget_item_spacing"
+                android:src="@android:drawable/ic_media_play"
+                android:background="@color/widget_button_background"
+                android:contentDescription="Iniciar timer"
+                android:scaleType="centerInside"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Right Section: Progress + Next Unlockable (weight 1) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/widget_inner_padding">
+
+            <!-- Progress fraction text -->
+            <TextView
+                android:id="@+id/txt_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0/1"
+                android:textColor="@color/widget_text_primary"
+                android:textSize="@dimen/widget_text_progress"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <!-- Horizontal progress bar -->
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/widget_progress_height"
+                android:layout_marginTop="@dimen/widget_item_spacing"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@android:drawable/progress_horizontal" />
+
+            <!-- Next unlockable label -->
+            <TextView
+                android:id="@+id/txt_next_unlockable_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/widget_section_spacing"
+                android:text="Siguiente:"
+                android:textColor="@color/widget_text_label"
+                android:textSize="@dimen/widget_text_label" />
+
+            <!-- Next unlockable knot title -->
+            <TextView
+                android:id="@+id/txt_next_unlockable_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Nada desbloqueable"
+                android:textColor="@color/widget_text_secondary"
+                android:textSize="@dimen/widget_text_body"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
