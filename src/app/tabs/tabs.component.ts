@@ -73,12 +73,12 @@ export class TabsComponent implements OnInit, OnDestroy {
       TimerPlugin.addListener('openFocus', (event) => {
         this.openFocusFromWidget(event.knotId);
       });
-      // Cold start: check multiple times to handle slow Angular bootstrap
-      setTimeout(() => this.checkPendingFocusIntent(), 1500);
-      setTimeout(() => this.checkPendingFocusIntent(), 3000);
+      // Cold start: if a timer is running natively, open focus modal automatically
+      setTimeout(() => this.autoOpenFocusIfTimerRunning(), 2000);
+      setTimeout(() => this.autoOpenFocusIfTimerRunning(), 4000);
       // And on resume (app was in background)
       this.platform.resume.subscribe(() => {
-        setTimeout(() => this.checkPendingFocusIntent(), 300);
+        setTimeout(() => this.autoOpenFocusIfTimerRunning(), 500);
       });
     }
   }
@@ -123,34 +123,30 @@ export class TabsComponent implements OnInit, OnDestroy {
   }
 
   private focusAlreadyOpened = false;
-  private pendingFocusKnotId: string | null = null;
 
-  private async checkPendingFocusIntent(): Promise<void> {
+  private async autoOpenFocusIfTimerRunning(): Promise<void> {
     if (this.focusAlreadyOpened) return;
+    try {
+      const state = await TimerPlugin.getState();
+      if (state.running) {
+        // Timer is running natively — find the knot and open focus modal
+        // First try pending focus intent for the knot ID
+        const pending = await TimerPlugin.consumePendingFocus();
+        let knotId = pending.pending ? pending.knotId : null;
 
-    // Check if we have a saved pending from a previous attempt
-    let knotId = this.pendingFocusKnotId;
-
-    if (!knotId) {
-      try {
-        const result = await TimerPlugin.consumePendingFocus();
-        if (result.pending && result.knotId) {
-          knotId = result.knotId;
-          this.pendingFocusKnotId = knotId;
+        // If no pending intent, try to find the DOING knot
+        if (!knotId) {
+          const doingKnot = this.store.getKnots().find(k => k.status === 'DOING');
+          knotId = doingKnot?.id ?? null;
         }
-      } catch (_) {
-        return;
-      }
-    }
 
-    if (knotId) {
-      const knot = this.store.getKnotById(knotId);
-      if (knot) {
-        this.focusAlreadyOpened = true;
-        this.pendingFocusKnotId = null;
-        this.openFocusFromWidget(knotId);
+        if (knotId && this.store.getKnotById(knotId)) {
+          this.focusAlreadyOpened = true;
+          this.openFocusFromWidget(knotId);
+        }
       }
-      // If knot not loaded yet, the next setTimeout will retry with saved knotId
+    } catch (_) {
+      // Plugin not available — ignore
     }
   }
 }
