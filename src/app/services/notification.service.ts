@@ -248,7 +248,6 @@ export class NotificationService {
   }
 
   async scheduleMorning(): Promise<void> {
-    if (!this.canSendMore()) return;
     const s   = this.getSettings();
     const msg = this.buildMorningMessage();
     if (!msg) return;
@@ -274,12 +273,10 @@ export class NotificationService {
           actionTypeId: 'MORNING_ACTIONS',
         }],
       });
-      this.incrementDailyCount();
     } catch (e) { console.error('scheduleMorning error:', e); }
   }
 
   async scheduleStreakProtection(): Promise<void> {
-    if (!this.canSendMore()) return;
     if (this.goal.countDoneToday() >= this.goal.getDailyGoal()) return;
 
     const s    = this.getSettings();
@@ -291,7 +288,6 @@ export class NotificationService {
     const msg = this.buildStreakMessage();
     try {
       await this.doSchedule(NOTIF_IDS.STREAK, msg.title, msg.body, next);
-      this.incrementDailyCount();
     } catch (e) { console.error('scheduleStreak error:', e); }
   }
 

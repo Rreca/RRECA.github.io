@@ -30,7 +30,6 @@ export class AppComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.notif.recordAppOpen();
-    await this.notif.cancelToday();
 
     // Recycle recurring knots that are due
     this.rules.recycleRecurringKnots();
