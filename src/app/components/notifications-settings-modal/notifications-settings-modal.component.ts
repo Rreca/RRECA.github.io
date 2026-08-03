@@ -57,7 +57,7 @@ export class NotificationsSettingsModalComponent implements OnInit {
 
   onMorningTimeChange(): void {
     const [h, m] = this.morningTime.split(':').map(Number);
-    this.settings.morningHour   = isNaN(h) ? 9 : Math.min(12, Math.max(6, h));
+    this.settings.morningHour   = isNaN(h) ? 9 : Math.min(15, Math.max(6, h));
     this.settings.morningMinute = isNaN(m) ? 0 : m;
   }
 
