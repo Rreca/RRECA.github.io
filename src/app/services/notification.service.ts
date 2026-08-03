@@ -169,7 +169,7 @@ export class NotificationService {
     return null;
   }
 
-  private buildMorningMessage(): { title: string; body: string } | null {
+  private buildMorningMessage(): { title: string; body: string } {
     const knots      = this.store.getKnots();
     const doing      = knots.filter(k => k.status === 'DOING');
     const unlockable = knots.filter(k => k.status === 'UNLOCKABLE');
@@ -179,7 +179,7 @@ export class NotificationService {
     if (unlockable.length > 1)  return { title: `${unlockable.length} desbloqueables esperando`, body: 'Elegí uno y arrancá. Solo 5 minutos.' };
     if (unlockable.length === 1) return { title: 'Hay 1 cosa lista para hacer', body: '¿Arrancamos? Solo 5 minutos.' };
     if (passive.length)         return { title: 'Sistema en pausa', body: 'Desbloqueá algo para seguir avanzando.' };
-    return null;
+    return { title: 'Buenos días', body: 'Capturá algo nuevo y arrancá el día.' };
   }
 
   private buildStreakMessage(): { title: string; body: string } {
@@ -250,7 +250,6 @@ export class NotificationService {
   async scheduleMorning(): Promise<void> {
     const s   = this.getSettings();
     const msg = this.buildMorningMessage();
-    if (!msg) return;
 
     const now  = new Date();
     const next = new Date();

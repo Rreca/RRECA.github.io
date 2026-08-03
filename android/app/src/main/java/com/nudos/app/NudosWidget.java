@@ -45,6 +45,16 @@ public class NudosWidget extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_nudos);
         WidgetDataModel data = WidgetDataParser.parse(context);
 
+        // Global tap-to-open-app PendingIntent (works on any non-button area)
+        Intent openAppIntent = new Intent(context, MainActivity.class);
+        openAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent openAppPendingIntent = PendingIntent.getActivity(
+                context, 50, openAppIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        views.setOnClickPendingIntent(R.id.txt_mantra, openAppPendingIntent);
+        views.setOnClickPendingIntent(R.id.txt_date, openAppPendingIntent);
+        views.setOnClickPendingIntent(R.id.txt_current_title, openAppPendingIntent);
+
         // Always show the date in Spanish: "Sábado, 1 de agosto"
         Locale es = new Locale("es", "ES");
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d 'de' MMMM", es);
