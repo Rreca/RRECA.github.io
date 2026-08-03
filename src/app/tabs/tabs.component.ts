@@ -60,6 +60,8 @@ export class TabsComponent implements OnInit, OnDestroy {
         this.timerRunning = s.running;
         if (s.running) {
           this.timerLabel = `⏱ ${this.timer.formatTime(s.secondsLeft)}`;
+          // Auto-open focus if timer started from outside (widget/notification)
+          this.tryOpenFocusForRunningTimer(s.knotId);
         }
       }),
       this.store.knots$.subscribe(() => {
@@ -78,6 +80,7 @@ export class TabsComponent implements OnInit, OnDestroy {
       setTimeout(() => this.autoOpenFocusIfTimerRunning(), 4000);
       // And on resume (app was in background)
       this.platform.resume.subscribe(() => {
+        this.focusAlreadyOpened = false; // Reset on resume to allow re-open
         setTimeout(() => this.autoOpenFocusIfTimerRunning(), 500);
       });
     }
@@ -115,6 +118,8 @@ export class TabsComponent implements OnInit, OnDestroy {
   }
 
   private async openFocusFromWidget(knotId: string): Promise<void> {
+    // Navigate to today tab first (in case user was on insights)
+    this.router.navigateByUrl('/today');
     const m = await this.modal.create({
       component: FocusTimerModalComponent,
       componentProps: { knotId },
@@ -123,6 +128,18 @@ export class TabsComponent implements OnInit, OnDestroy {
   }
 
   private focusAlreadyOpened = false;
+
+  /** Called from timer state subscription when timer is running */
+  private tryOpenFocusForRunningTimer(knotId: string | null): void {
+    if (this.focusAlreadyOpened) return;
+    if (!this.platform.is('android')) return;
+    // knotId null = synced from native (widget/notification start), not from local timer.start()
+    // In that case, autoOpenFocusIfTimerRunning will handle it via setTimeout
+    // If knotId is set, it was started locally — the UI already handles the modal
+    if (knotId) return;
+    // Trigger the auto-open check
+    this.autoOpenFocusIfTimerRunning();
+  }
 
   private async autoOpenFocusIfTimerRunning(): Promise<void> {
     if (this.focusAlreadyOpened) return;
