@@ -15,11 +15,11 @@
         android:layout_height="wrap_content"
         android:text="Soy alguien que hace lo importante, tenga ganas o no"
         android:textColor="@color/widget_text_primary"
-        android:textSize="22sp"
+        android:textSize="16sp"
         android:textStyle="italic"
         android:gravity="center"
         android:paddingBottom="6dp"
-        android:maxLines="2" />
+        android:maxLines="3" />
 
     <!-- Main content: horizontal split -->
     <LinearLayout
