@@ -1,7 +1,5 @@
 node_modules
 .angular/
-www/
-dist/
 android/app/build/
 android/.gradle/
 android/capacitor-cordova-android-plugins/build/
