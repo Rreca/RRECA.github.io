@@ -74,6 +74,8 @@ export class TodayPage implements OnInit, OnDestroy {
 
   doneOpen = true;
   backlogOpen = true;
+  doingOpen = true;
+  unlockablesOpen = true;
 
   // First touch of the day celebration
   firstTouchCelebration = false;
@@ -123,6 +125,8 @@ export class TodayPage implements OnInit, OnDestroy {
         // Abre el details si corresponde
         if (['SOMEDAY', 'BLOCKED'].includes(scrollTo)) this.backlogOpen = true;
         if (scrollTo === 'DONE') this.doneOpen = true;
+        if (scrollTo === 'DOING') this.doingOpen = true;
+        if (scrollTo === 'UNLOCKABLE') this.unlockablesOpen = true;
 
         // Espera que el DOM se actualice
         setTimeout(() => this.scrollToSection(scrollTo), 350);

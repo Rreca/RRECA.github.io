@@ -64,7 +64,7 @@ export class KnotDetailModalComponent implements OnInit {
 
   get reasonLabel(): string {
     const map: Record<string, string> = {
-      NO_START: 'No sé por dónde empezar', LAZINESS: 'Pereza', FEAR: 'Miedo',
+      NONE: 'Ninguno', NO_START: 'No sé por dónde empezar', LAZINESS: 'Pereza', FEAR: 'Miedo',
       EXTERNAL: 'Depende de un externo', NOT_TODAY: 'No hoy',
     };
     return map[this.knot.blockReason] ?? this.knot.blockReason;

@@ -41,6 +41,7 @@
     <div class="field">
       <label>Motivo del bloqueo</label>
       <select [(ngModel)]="blockReason" (ngModelChange)="onReasonChange()" class="ion-select-native">
+        <option value="NONE">Ninguno</option>
         <option value="NO_START">No sé por dónde empezar</option>
         <option value="LAZINESS">Pereza</option>
         <option value="FEAR">Miedo</option>
@@ -51,7 +52,7 @@
 
     <!-- Próximo paso -->
     <div *ngIf="showNextStep" class="field">
-      <label>Próximo paso (obligatorio)</label>
+      <label>Próximo paso {{ blockReason === 'NONE' ? '(opcional)' : '(obligatorio)' }}</label>
       <input [(ngModel)]="nextStep" placeholder="Ej: abrir la web y buscar el trámite" class="ion-input-native" />
     </div>
 

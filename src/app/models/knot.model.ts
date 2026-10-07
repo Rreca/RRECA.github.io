@@ -1,5 +1,5 @@
 export type KnotStatus = 'BLOCKED' | 'UNLOCKABLE' | 'DOING' | 'DONE' | 'SOMEDAY' | 'ARCHIVED';
-export type BlockReason = 'NO_START' | 'LAZINESS' | 'FEAR' | 'EXTERNAL' | 'NOT_TODAY';
+export type BlockReason = 'NONE' | 'NO_START' | 'LAZINESS' | 'FEAR' | 'EXTERNAL' | 'NOT_TODAY';
 export type KnotContext = 'ANY' | 'HOME' | 'STREET' | 'WORK';
 export type ContextFilter = 'ALL' | 'HOME' | 'STREET' | 'WORK' | 'ANY';
 export type ArchiveReason = 'SPLIT' | 'DONE_MERGE' | 'MANUAL' | 'CLEANUP' | 'OTHER';

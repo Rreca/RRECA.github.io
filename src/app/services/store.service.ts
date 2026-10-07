@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { Capacitor } from '@capacitor/core';
+import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 import { Knot, KnotPatch } from '../models/knot.model';
 import { Chain } from '../models/chain.model';
 import { AppEvent, EventType } from '../models/event.model';
@@ -224,7 +227,7 @@ export class StoreService {
 
   // ─── Import / Export ─────────────────────────────────────────────────────
 
-  exportData(): void {
+  async exportData(): Promise<void> {
     const data = {
       version: 1,
       exportedAt: Date.now(),
@@ -232,13 +235,40 @@ export class StoreService {
       events: this.getEvents(),
       chains: this.getChains(),
     };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const json = JSON.stringify(data, null, 2);
+    const fileName = `nudos_backup_${new Date().toISOString().slice(0, 10)}.json`;
+
+    // Android WebView does not reliably handle downloads from blob: URLs.
+    // Save to the app cache and hand the file to Android's native share sheet.
+    if (Capacitor.isNativePlatform()) {
+      const saved = await Filesystem.writeFile({
+        path: fileName,
+        data: json,
+        directory: Directory.Cache,
+        encoding: Encoding.UTF8,
+      });
+      try {
+        await Share.share({
+          title: 'Backup de Nudos',
+          text: 'Backup de datos de Nudos',
+          url: saved.uri,
+          dialogTitle: 'Guardar o compartir backup',
+        });
+      } finally {
+        await Filesystem.deleteFile({ path: fileName, directory: Directory.Cache }).catch(() => undefined);
+      }
+      return;
+    }
+
+    const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'nudos_backup.json';
+    a.download = fileName;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   importData(raw: string): void {

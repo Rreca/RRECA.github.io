@@ -8,6 +8,11 @@ details > summary::-webkit-details-marker {
   display: none;
 }
 
+.collapsible-header {
+  flex: 1;
+  user-select: none;
+}
+
 .view-toggle {
   display: inline-flex;
   gap: 4px;

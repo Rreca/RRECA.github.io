@@ -27,7 +27,7 @@ import { generateUUID } from '../../utils/utils';
 })
 export class CaptureModalComponent implements OnInit {
   title = '';
-  blockReason: BlockReason = 'NO_START';
+  blockReason: BlockReason = 'NONE';
   contextPick = 'AUTO';
   nextStep = '';
   estMinutes: number | null = 5;
@@ -71,7 +71,7 @@ export class CaptureModalComponent implements OnInit {
 
   private refreshFields(): void {
     const needsNext = ['NO_START', 'LAZINESS', 'FEAR'].includes(this.blockReason);
-    this.showNextStep = needsNext;
+    this.showNextStep = this.blockReason === 'NONE' || needsNext;
     this.showEstMinutes = needsNext;
     this.showExternalWait = this.blockReason === 'EXTERNAL';
   }
@@ -145,7 +145,7 @@ export class CaptureModalComponent implements OnInit {
         weight: this.friction,
         impact: this.impact,
         nextStep: this.nextStep.trim() || null,
-        estMinutes: this.estMinutes,
+        estMinutes: this.blockReason === 'NONE' ? null : this.estMinutes,
         externalWait: this.externalWait.trim() || null,
         createdAt: Date.now(),
         updatedAt: Date.now(),

@@ -43,43 +43,53 @@
     <ng-container *ngIf="viewMode === 'list'">
 
     <!-- ════ EN PROGRESO ════ -->
-    <div id="section-doing" class="section-header">
-      <span class="section-title">🚀 En progreso</span>
-      <span class="section-meta">1 a la vez</span>
-    </div>
+    <details id="section-doing" [open]="doingOpen"
+      (toggle)="doingOpen = $any($event.target).open">
+      <summary style="list-style:none; cursor:pointer;">
+        <div class="section-header collapsible-header">
+          <span class="section-title">🚀 En progreso</span>
+          <span class="section-meta">{{ doingKnot ? '1 activo' : 'vacío' }} · {{ doingOpen ? '▲' : '▼' }}</span>
+        </div>
+      </summary>
 
-    <app-knot-card
-      *ngIf="doingKnot"
-      [knot]="doingKnot"
-      [quickEditHidden]="quickEditHidden"
-      (refresh)="render()">
-    </app-knot-card>
-
-    <div *ngIf="!doingKnot" class="notice">
-      Nada en progreso. Elegí un DESBLOQUEABLE y arrancá.
-    </div>
-
-    <!-- ════ DESBLOQUEABLES ════ -->
-    <div id="section-unlockable" class="section-header" style="margin-top:8px;">
-      <span class="section-title">🔓 Desbloqueables</span>
-      <span class="section-meta">máx 3</span>
-    </div>
-
-    <ng-container *ngIf="unlockables.length; else noUnlockables">
       <app-knot-card
-        *ngFor="let k of unlockables"
-        [knot]="k"
+        *ngIf="doingKnot"
+        [knot]="doingKnot"
         [quickEditHidden]="quickEditHidden"
         (refresh)="render()">
       </app-knot-card>
-    </ng-container>
-    <ng-template #noUnlockables>
-      <div class="empty-state">
-        <div class="empty-icon">🔓</div>
-        <div class="empty-title">Sin desbloqueables</div>
-        <div class="empty-sub">Capturá algo nuevo o desbloqueable del backlog.</div>
+
+      <div *ngIf="!doingKnot" class="notice">
+        Nada en progreso. Elegí un DESBLOQUEABLE y arrancá.
       </div>
-    </ng-template>
+    </details>
+
+    <!-- ════ DESBLOQUEABLES ════ -->
+    <details id="section-unlockable" [open]="unlockablesOpen" style="margin-top:8px;"
+      (toggle)="unlockablesOpen = $any($event.target).open">
+      <summary style="list-style:none; cursor:pointer;">
+        <div class="section-header collapsible-header" style="padding-top:12px;">
+          <span class="section-title">🔓 Desbloqueables</span>
+          <span class="section-meta">{{ unlockables.length }} · {{ unlockablesOpen ? '▲' : '▼' }}</span>
+        </div>
+      </summary>
+
+      <ng-container *ngIf="unlockables.length; else noUnlockables">
+        <app-knot-card
+          *ngFor="let k of unlockables"
+          [knot]="k"
+          [quickEditHidden]="quickEditHidden"
+          (refresh)="render()">
+        </app-knot-card>
+      </ng-container>
+      <ng-template #noUnlockables>
+        <div class="empty-state">
+          <div class="empty-icon">🔓</div>
+          <div class="empty-title">Sin desbloqueables</div>
+          <div class="empty-sub">Capturá algo nuevo o desbloqueable del backlog.</div>
+        </div>
+      </ng-template>
+    </details>
 
     <!-- ════ HECHOS (colapsable) ════ -->
     <details id="section-done" [open]="doneOpen" style="margin-top:8px;"

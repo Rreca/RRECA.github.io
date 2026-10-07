@@ -88,7 +88,16 @@ export class InsightsPage implements OnInit, OnDestroy {
 
     this.counts = {};
     for (const s of ['BLOCKED', 'UNLOCKABLE', 'DOING', 'DONE', 'SOMEDAY', 'ARCHIVED']) {
-      this.counts[s] = knots.filter(k => k.status === s).length;
+      let statusKnots = knots.filter(k => k.status === s);
+
+      // The backlog applies an exact context match when a context filter is
+      // active, so ANY items are not displayed there. Keep its SOMEDAY total
+      // identical to the number the user can actually see in the backlog.
+      if (s === 'SOMEDAY' && filter !== 'ALL') {
+        statusKnots = statusKnots.filter(k => this.ctx.getKnotContext(k) === filter);
+      }
+
+      this.counts[s] = statusKnots.length;
     }
 
     this.doneToday = this.goal.countDoneToday(knots);
@@ -165,8 +174,14 @@ export class InsightsPage implements OnInit, OnDestroy {
 
   // ─── Export / Import ─────────────────────────────────────────────────────
 
-  exportData(): void {
-    this.store.exportData();
+  async exportData(): Promise<void> {
+    try {
+      await this.store.exportData();
+    } catch (err) {
+      const message = (err as Error)?.message || 'No se pudo exportar el backup.';
+      const alert = await this.alert.create({ header: 'Error al exportar', message, buttons: ['OK'] });
+      await alert.present();
+    }
   }
 
   async importData(): Promise<void> {

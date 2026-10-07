@@ -71,6 +71,27 @@ describe('CaptureModalComponent - Chain Flow', () => {
     expect(component.chainOption).toBe('none');
   });
 
+  it('should default blockReason to NONE and show optional next step', () => {
+    component.ngOnInit();
+    expect(component.blockReason).toBe('NONE');
+    expect(component.showNextStep).toBeTrue();
+    expect(component.showEstMinutes).toBeFalse();
+  });
+
+  it('should create a NONE knot without a next step', async () => {
+    component.ngOnInit();
+    component.title = 'Nudo sin bloqueo';
+    component.nextStep = '';
+
+    await component.submit();
+
+    const created = store.getKnots()[0];
+    expect(created.blockReason).toBe('NONE');
+    expect(created.status).toBe('UNLOCKABLE');
+    expect(created.nextStep).toBeNull();
+    expect(created.estMinutes).toBeNull();
+  });
+
   // ─── Chain name validation ──────────────────────────────────────────────
 
   it('should reject empty chain name with validation error', async () => {

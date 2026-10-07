@@ -65,7 +65,7 @@ export class EditSomedayModalComponent implements OnInit {
 
   private refreshFields(): void {
     const needsNext = ['NO_START', 'LAZINESS', 'FEAR'].includes(this.blockReason);
-    this.showNextStep = needsNext;
+    this.showNextStep = this.blockReason === 'NONE' || needsNext;
     this.showEstMinutes = needsNext;
     this.showExternalWait = this.blockReason === 'EXTERNAL';
   }
@@ -87,7 +87,11 @@ export class EditSomedayModalComponent implements OnInit {
 
     // Recalcular status según el motivo
     let newStatus: 'UNLOCKABLE' | 'BLOCKED' | 'SOMEDAY' = 'SOMEDAY';
-    if (['NO_START', 'LAZINESS', 'FEAR'].includes(this.blockReason)) {
+    if (this.blockReason === 'NONE') {
+      newStatus = 'UNLOCKABLE';
+    } else if (this.blockReason === 'NO_START') {
+      newStatus = 'SOMEDAY';
+    } else if (['LAZINESS', 'FEAR'].includes(this.blockReason)) {
       newStatus = 'UNLOCKABLE';
     } else if (this.blockReason === 'EXTERNAL') {
       newStatus = 'BLOCKED';
@@ -103,7 +107,7 @@ export class EditSomedayModalComponent implements OnInit {
       blockReason: this.blockReason,
       status: newStatus,
       nextStep: this.nextStep.trim() || null,
-      estMinutes: this.estMinutes,
+      estMinutes: this.blockReason === 'NONE' ? null : this.estMinutes,
       externalWait: this.externalWait.trim() || null,
       updatedAt: Date.now(),
     });

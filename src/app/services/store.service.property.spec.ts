@@ -8,7 +8,7 @@ import { Chain } from '../models/chain.model';
 // ─── Custom Generators ─────────────────────────────────────────────────────
 
 const STATUSES: KnotStatus[] = ['BLOCKED', 'UNLOCKABLE', 'DOING', 'DONE', 'SOMEDAY'];
-const BLOCK_REASONS: BlockReason[] = ['NO_START', 'LAZINESS', 'FEAR', 'EXTERNAL', 'NOT_TODAY'];
+const BLOCK_REASONS: BlockReason[] = ['NONE', 'NO_START', 'LAZINESS', 'FEAR', 'EXTERNAL', 'NOT_TODAY'];
 const CONTEXTS: KnotContext[] = ['ANY', 'HOME', 'STREET', 'WORK'];
 
 /** Generates a valid chain name: 1–50 chars with at least one non-whitespace */

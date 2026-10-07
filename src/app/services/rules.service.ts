@@ -69,7 +69,17 @@ export class RulesService {
     knot.weight = this.normalizeFriction(knot.weight);
     knot.impact = this.normalizeImpact(knot.impact);
 
-    if (['NO_START', 'LAZINESS', 'FEAR'].includes(knot.blockReason)) {
+    if (knot.blockReason === 'NONE') {
+      knot.status = 'UNLOCKABLE';
+      knot.estMinutes = null;
+      knot.externalWait = null;
+    } else if (knot.blockReason === 'NO_START') {
+      if (!knot.nextStep?.trim() || (knot.estMinutes ?? 0) > 5) {
+        throw new Error('Para este motivo: "Próximo paso" obligatorio y "Minutos estimados" <= 5.');
+      }
+      knot.status = 'SOMEDAY';
+      knot.externalWait = null;
+    } else if (['LAZINESS', 'FEAR'].includes(knot.blockReason)) {
       if (!knot.nextStep?.trim() || (knot.estMinutes ?? 0) > 5) {
         throw new Error('Para este motivo: "Próximo paso" obligatorio y "Minutos estimados" <= 5.');
       }
@@ -103,7 +113,20 @@ export class RulesService {
     candidate.weight = this.normalizeFriction(candidate.weight);
     candidate.impact = this.normalizeImpact(candidate.impact);
 
-    if (['NO_START', 'LAZINESS', 'FEAR'].includes(candidate.blockReason)) {
+    if (candidate.blockReason === 'NONE') {
+      candidate.status = 'UNLOCKABLE';
+      candidate.estMinutes = null;
+      candidate.externalWait = null;
+    } else if (candidate.blockReason === 'NO_START') {
+      if (!candidate.nextStep?.trim()) {
+        throw new Error('Para este motivo, el "Próximo paso" es obligatorio.');
+      }
+      if (candidate.estMinutes && candidate.estMinutes > 5) {
+        throw new Error('Para este motivo, "Minutos estimados" debe ser <= 5.');
+      }
+      candidate.status = 'SOMEDAY';
+      candidate.externalWait = null;
+    } else if (['LAZINESS', 'FEAR'].includes(candidate.blockReason)) {
       if (!candidate.nextStep?.trim()) {
         throw new Error('Para este motivo, el "Próximo paso" es obligatorio.');
       }

@@ -143,10 +143,24 @@ describe('RulesService', () => {
       expect(() => service.validateNewKnot(k)).toThrow();
     });
 
+    it('should set status to UNLOCKABLE for NONE without requiring nextStep', () => {
+      const k = makeKnot({ blockReason: 'NONE', nextStep: null, estMinutes: 5 });
+      const result = service.validateNewKnot(k);
+      expect(result.status).toBe('UNLOCKABLE');
+      expect(result.nextStep).toBeNull();
+      expect(result.estMinutes).toBeNull();
+    });
+
     it('should set status to UNLOCKABLE for LAZINESS with valid nextStep <= 5min', () => {
       const k = makeKnot({ blockReason: 'LAZINESS', nextStep: 'Algo concreto', estMinutes: 5 });
       const result = service.validateNewKnot(k);
       expect(result.status).toBe('UNLOCKABLE');
+    });
+
+    it('should set status to SOMEDAY for NO_START', () => {
+      const k = makeKnot({ blockReason: 'NO_START', nextStep: 'Definir cómo empezar', estMinutes: 5 });
+      const result = service.validateNewKnot(k);
+      expect(result.status).toBe('SOMEDAY');
     });
 
     it('should throw for LAZINESS when nextStep is empty', () => {
@@ -180,7 +194,7 @@ describe('RulesService', () => {
       store.createKnot(makeKnot({ status: 'UNLOCKABLE' }));
       store.createKnot(makeKnot({ status: 'UNLOCKABLE' }));
       store.createKnot(makeKnot({ status: 'UNLOCKABLE' }));
-      const k = makeKnot({ blockReason: 'NO_START', nextStep: 'Algo', estMinutes: 5 });
+      const k = makeKnot({ blockReason: 'LAZINESS', nextStep: 'Algo', estMinutes: 5 });
       expect(() => service.validateNewKnot(k)).toThrow();
     });
   });

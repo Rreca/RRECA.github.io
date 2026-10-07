@@ -64,6 +64,7 @@
 
       <!-- UNLOCKABLE -->
       <ng-container *ngIf="knot.status === 'UNLOCKABLE'">
+        <ion-button size="small" fill="clear" (click)="openEdit($event)">Editar</ion-button>
         <ion-button size="small" fill="solid" color="primary" (click)="startDoing($event)">Iniciar</ion-button>
         <ion-button size="small" fill="clear" (click)="sendToSomeday($event)">Algún día</ion-button>
         <ion-button size="small" fill="clear" (click)="openSplit($event)">🧩 Dividir</ion-button>
@@ -71,7 +72,7 @@
 
       <!-- SOMEDAY -->
       <ng-container *ngIf="knot.status === 'SOMEDAY'">
-        <ion-button size="small" fill="solid" color="primary" (click)="openEditSomeday($event)">Editar</ion-button>
+        <ion-button size="small" fill="solid" color="primary" (click)="openEdit($event)">Editar</ion-button>
         <ion-button size="small" fill="clear" (click)="convertToUnlockable($event)">🛠 Desbloquear</ion-button>
         <ion-button size="small" fill="clear" (click)="openSplit($event)">🧩 Dividir</ion-button>
         <ion-button size="small" fill="clear" color="danger" (click)="deleteKnot($event)">Eliminar</ion-button>
@@ -79,7 +80,7 @@
 
       <!-- BLOCKED -->
       <ng-container *ngIf="knot.status === 'BLOCKED'">
-        <ion-button size="small" fill="solid" color="primary" (click)="openEditSomeday($event)">Editar</ion-button>
+        <ion-button size="small" fill="solid" color="primary" (click)="openEdit($event)">Editar</ion-button>
         <ion-button size="small" fill="clear" (click)="convertToUnlockable($event)">🛠 Desbloquear</ion-button>
         <ion-button size="small" fill="clear" (click)="openSplit($event)">🧩 Dividir</ion-button>
         <ion-button size="small" fill="clear" color="danger" (click)="deleteKnot($event)">Eliminar</ion-button>
